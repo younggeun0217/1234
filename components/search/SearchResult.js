@@ -69,13 +69,11 @@ export default SearchResult;
 const styles = StyleSheet.create({
     defaultScreen: {
         flex: 1,
-        marginTop: 15,
-        marginHorizontal: 30,
+        paddingHorizontal: 30,
     },
     extendedScreen: {
         flex: 1,
-        marginTop: 15,
-        marginHorizontal: 30,
+        paddingHorizontal: 30,
         height: '89%'
     }
 });

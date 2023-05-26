@@ -7,7 +7,7 @@ import SearchOptions from "./SearchOptions";
 import SearchResult from "./SearchResult";
 
 function Search() {
-    const [pressed, setPressed] = useState(true);
+    const [pressed, setPressed] = useState(false);
 
     const showOptionHandler = () => {
         setPressed(!pressed);

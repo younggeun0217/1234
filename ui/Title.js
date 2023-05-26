@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: 'white',
         textAlign: 'center',
-        paddingTop: 35,
+        paddingTop: 45,
         paddingBottom: 15,
         backgroundColor: '#A3A098',
     }

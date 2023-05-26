@@ -4,17 +4,27 @@ import { Text, View, StyleSheet, TextInput, FlatList, Platform, Pressable } from
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { Entypo } from '@expo/vector-icons'; // expo icons 이미지
 import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
+import SearchModal from "./SearchModal";
 
 function SearchOptionList() {
-    const [district, setDistrict] = useState(['AB구', 'CD구', 'EF구']); // **구 list
+    const [district, setDistrict] = useState(['강남구', '성동구']); // **구 list
     const [numColumns, setNumColumns] = useState(5); // 최대 5개로 함
+    const [modalIsVisible, setModalIsVisible] = useState(false); // 구 input칸 클릭 시 나오는 modal (true, false)
 
     function DistrictList({districts}) {
         return <Text style={styles.districtItems}>{districts}</Text>;
     }
+
+    function startSearch() {
+        setModalIsVisible(true);
+    }
+
+    function endSearch() {
+        setModalIsVisible(false);
+    }
     
     return (
-        <View> 
+        <View style={styles.screen}> 
             <View style={styles.subTitle1}>
                 <TextInput style={styles.subTitleText} placeholder="전시"></TextInput>
             </View>
@@ -24,9 +34,10 @@ function SearchOptionList() {
             <View style={styles.subTitle2}>
                 <FlatList data={district} renderItem={(itemData) => <DistrictList districts={itemData.item} />} keyExtractor={(item) => item} numColumns={numColumns} />
                 <Pressable>
-                    <Entypo name="triangle-right" size={24} color="#A3A098" />
+                    <Entypo name="triangle-right" size={24} color="#A3A098" onPress={startSearch} />
                 </Pressable>
             </View>
+            <SearchModal pressed={modalIsVisible} onCancel={endSearch} />
             <View style={styles.subTitle2}>
                 <Pressable>
                     <Text style={styles.districtItems}>2023-03-01</Text>
@@ -54,6 +65,9 @@ function SearchOptionList() {
 export default SearchOptionList;
 
 const styles = StyleSheet.create({
+    screen: {
+        marginBottom: "5%"
+    },
     subTitle1: {
         borderBottomColor: 'black',
         borderBottomWidth: 3,
