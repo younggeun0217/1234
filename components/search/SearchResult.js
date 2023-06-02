@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 
-import SearchItems from "./SearchItems";
+import SearchItems from "./SearchItems"; // SearchResult에서 SearchItems를 핸들링
 
 function SearchResult({pressed}) {
-    const searchResults = ExhibitionList();
-    const [exhibitionData, setExhibitionData] = useState(searchResults);
-    const [numColumns, setNumColumns] = useState(2);
+    const searchResults = ExhibitionList(); // 더미 데이터들
+    const [exhibitionData, setExhibitionData] = useState(searchResults); // 더미 데이터들을 useState로 관리
+    const [numColumns, setNumColumns] = useState(2); // 전시회 결과를 가로 열에 2개씩 배열
 
-    function ExhibitionList() {
+    function ExhibitionList() { // 더미 데이터들 (더미 데이터로 검색 연습하려면 지역구도 넣어야 함)
         const exhibition1 = {
             title: '참조점',
             imageUrl: "https://art-map.co.kr/art-map/public//upload/2023/05/exhibition/fa3fba495cdbf61d5d50f96c2315bf27_.jpg",
@@ -52,14 +52,21 @@ function SearchResult({pressed}) {
             startDate: '2023.05.18',
             endDate: '2023.06.07'
         };
+        
         const testData = [exhibition1, exhibition2, exhibition3, exhibition4, exhibition5, exhibition6];
     
-        return testData;
+        return testData; // 더미 데이터 반환
     }
 
     return (
         <View style={pressed ? styles.defaultScreen : styles.extendedScreen}>
-            <FlatList data={exhibitionData} renderItem={({item}) => <SearchItems result={item} />} keyExtractor={(item) => item.title} numColumns={numColumns} />
+            <FlatList 
+                data={exhibitionData} 
+                renderItem={({item}) => <SearchItems result={item} />} 
+                keyExtractor={(item) => item.title} 
+                numColumns={numColumns} 
+                showsVerticalScrollIndicator={false} 
+            />
         </View>
     );
 }
@@ -67,13 +74,15 @@ function SearchResult({pressed}) {
 export default SearchResult;
 
 const styles = StyleSheet.create({
-    defaultScreen: {
+    defaultScreen: { // 검색 옵션 있을 때
         flex: 1,
-        paddingHorizontal: 30,
+        paddingLeft: 30,
+        paddingRight: 10
     },
-    extendedScreen: {
+    extendedScreen: { // 검색 옵션 없앴을 때
         flex: 1,
-        paddingHorizontal: 30,
+        paddingLeft: 30,
+        paddingRight: 10,
         height: '89%'
     }
 });

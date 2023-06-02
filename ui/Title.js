@@ -1,8 +1,8 @@
 // 맨 위에 있는 title : Art Calendar (UI)
 import { Text, StyleSheet } from "react-native";
 
-function Title({children}) {
-    return <Text style={styles.title}>{children}</Text>
+function Title({children}) { // <Title>내용</Title>
+    return <Text style={styles.title}>{children}</Text>;
 }
 
 export default Title;
