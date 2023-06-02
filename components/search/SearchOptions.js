@@ -1,26 +1,29 @@
-// 전시 ~ find, 돋보기 이미지까지
+// 전시 ~ find, 돋보기 이미지까지 검색 옵션들
 import { useState } from "react";
-import { Text, View, StyleSheet, TextInput, FlatList, Platform, Pressable } from "react-native";
+import { Text, View, StyleSheet, TextInput, ScrollView, Platform, Pressable } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { Entypo } from '@expo/vector-icons'; // expo icons 이미지
 import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
-import SearchModal from "./SearchModal";
+import DistrictModal from "./DistrictModal"; // SearchOption에서 Modal 관리
 
 function SearchOptionList() {
-    const [district, setDistrict] = useState(['강남구', '성동구']); // **구 list
-    const [numColumns, setNumColumns] = useState(5); // 최대 5개로 함
-    const [modalIsVisible, setModalIsVisible] = useState(false); // 구 input칸 클릭 시 나오는 modal (true, false)
+    const [district, setDistrict] = useState(['']); // 서울 지역구 배열(List)
+    const [modalIsVisible, setModalIsVisible] = useState(false); // 구 input칸 클릭 시 나오는 modal (true / false)
 
-    function DistrictList({districts}) {
+    function DistrictList({districts}) { // 서울 지역구 출력 함수
         return <Text style={styles.districtItems}>{districts}</Text>;
     }
 
-    function startSearch() {
+    function openModal() { // Modal 열기
         setModalIsVisible(true);
     }
 
-    function endSearch() {
+    function closeModal() { // Modal 닫기
         setModalIsVisible(false);
+    }
+
+    function handleSetDistrict(districts) { // district 상태를 handling하는 함수
+        setDistrict(districts);
     }
     
     return (
@@ -32,12 +35,21 @@ function SearchOptionList() {
                 <TextInput style={styles.subTitleText} placeholder="장소"></TextInput>
             </View>
             <View style={styles.subTitle2}>
-                <FlatList data={district} renderItem={(itemData) => <DistrictList districts={itemData.item} />} keyExtractor={(item) => item} numColumns={numColumns} />
+                <ScrollView
+                    contentContainerStyle={styles.scrollViewContent}
+                    horizontal={true}
+                >
+                {district.map((item, index) => (<DistrictList key={index} districts={item} />))}
+                </ScrollView>
                 <Pressable>
-                    <Entypo name="triangle-right" size={24} color="#A3A098" onPress={startSearch} />
+                    <Entypo name="triangle-right" size={24} color="#A3A098" onPress={openModal} />
                 </Pressable>
             </View>
-            <SearchModal pressed={modalIsVisible} onCancel={endSearch} />
+            <DistrictModal 
+                pressed={modalIsVisible} 
+                onCancel={closeModal}
+                onSelectedDistrictList={handleSetDistrict}    
+            />
             <View style={styles.subTitle2}>
                 <Pressable>
                     <Text style={styles.districtItems}>2023-03-01</Text>
@@ -68,15 +80,14 @@ const styles = StyleSheet.create({
     screen: {
         marginBottom: "5%"
     },
-    subTitle1: {
+    subTitle1: { // 전시, 장소 boxes
         borderBottomColor: 'black',
         borderBottomWidth: 3,
-        backgroundColor: '#A3A098',
-        opacity: 0.35,
+        backgroundColor: 'rgba(163, 160, 152, 0.1)',
         marginHorizontal: 30,
         marginBottom: 15
     },
-    subTitle2: {
+    subTitle2: { // 지역구, 날짜 boxes
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderBottomColor: 'black',
@@ -84,36 +95,35 @@ const styles = StyleSheet.create({
         marginHorizontal: 30,
         marginBottom: 15,
     },
-    subTitleText: {
-        color: 'black'
+    subTitleText: { // 옵션에 작성되는 텍스트
+        color: 'black',
+        fontSize: 18
     },
-    districtItems: {
+    districtItems: { // 지역구, 날짜 border, fontsize...
         fontSize: 16,
         paddingHorizontal: 15,
         marginHorizontal: 10,
         marginVertical: 3,
-        backgroundColor: '#A3A098',
+        backgroundColor: 'rgba(163, 160, 152, 0.1)',
         borderRadius: 16,
-        opacity: 0.5
     },
-    districtText: {
+    districtText: { // ~ << css
         fontSize: 16,
         paddingHorizontal: 6,
         marginHorizontal: 10,
         marginVertical: 3,
-        overflow: Platform.OS === 'android' ? 'hidden' : 'visible',
-        opacity: 0.5
+        color: '#A3A098'
     },
-    search: {
+    search: { // Find, 돋보기 box
         flexDirection: 'row',
         justifyContent: 'center',
     },
-    searchUi: {
+    searchUi: { // Find inner box
         marginHorizontal: 20,
         borderRadius: 24,
         backgroundColor: '#A3A098'
     },
-    searchFont: {
+    searchFont: { // Find 폰트
         fontSize: 24,
         paddingHorizontal: 24,
         paddingVertical: 8,

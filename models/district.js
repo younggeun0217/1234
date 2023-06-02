@@ -1,7 +1,7 @@
 class district {
     constructor(id, name) {
-        this.id = id;
-        this.name = name;
+        this.id = id; // int
+        this.name = name; // String
     }
 }
 
