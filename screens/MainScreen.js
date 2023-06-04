@@ -6,7 +6,7 @@ import Search from "../components/search/Search";
 function MainScreen(){
     return (
         <View style={styles.screen}>
-            <Title>Art Calendar</Title> 
+            <Title>Art Calendar:Seoul</Title> 
             <View style={styles.rootContainer}>
                 <Search />
             </View>
