@@ -1,13 +1,12 @@
 import axios from 'axios';
 
-const DATABASE_URL = 'https://art-calendar-7d7e6-default-rtdb.firebaseio.com/'
+const DATABASE_URL = 'https://art-calendar-7d7e6-default-rtdb.firebaseio.com';
 
 export async function fetchExhibitions() {
     const response = await axios.get(DATABASE_URL + '/exhibitions.json');
 
     const exhibitions = [];
     
-    // console.log(response.data);
     for (const key in response.data) {
         const exhibitionsObject = {
             id: key,

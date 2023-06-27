@@ -1,20 +1,18 @@
 // 검색 결과 이미지, title, 장소, 날짜, 전시중
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { fetchExhibitions } from "../../DB/firebase";
 
-function truncateText(text, maxLength) { // 전시회 검색 결과 텍스트들 글자 길이 설정
-    if (text.length > maxLength) {
-        return text.substring(0, maxLength) + "...";
-    }
-    return text;
-}
+// function truncateText(text, maxLength) { // 전시회 검색 결과 텍스트들 글자 길이 설정
+//     if (text.length > maxLength) {
+//         return text.substring(0, maxLength) + "...";
+//     }
+//     return text;
+// }
 
 function SearchItems({result}) {
-    const { id, title, imageUrl, location, startDate, endDate } = result; // result객체를 분해
-    const truncatedTitle = truncateText(title, 18); // 전시회 제목 글자 수 제한
-    const truncatedLocation = truncateText(location, 18); // 전시회 장소 글자 수 제한
+    const { id, title, exhibition, startDate, endDate, thumbnail } = result; // result객체를 분해
+    // const truncatedTitle = truncateText(title, 18); // 전시회 제목 글자 수 제한
+    // const truncatedLocation = truncateText(location, 18); // 전시회 장소 글자 수 제한
 
     const navigation = useNavigation();
 
@@ -24,25 +22,15 @@ function SearchItems({result}) {
         });
     }
 
-    const [fetchedExhibitions, setFetchedExhibitions] = useState([]);
-
-    useEffect(() => {
-        async function getExhibitions() {
-            const exhibitions = await fetchExhibitions();
-            setFetchedExhibitions(exhibitions);
-        }
-        getExhibitions();
-    }, []);
-
     return (
         <View style={styles.root}>
             <Pressable onPress={exhivitionPressHandler} style={({pressed}) => pressed && styles.pressed}>
                 <View style={styles.screen}>
                     <View style={styles.listItems}>
-                        <Image style={styles.logoImage} source={{uri: imageUrl}} />
+                        <Image style={styles.logoImage} source={{uri: thumbnail}} />
                         <View style={styles.lists}>
-                            <Text style={styles.text}>{truncatedTitle}</Text>
-                            <Text style={styles.text}>{truncatedLocation}</Text>
+                            <Text style={styles.text}>{title}</Text>
+                            <Text style={styles.text}>{exhibition}</Text>
                             <Text style={styles.text}>{startDate} ~ {endDate}</Text>
                             <Text style={styles.onGoing}>전시중</Text>
                         </View>

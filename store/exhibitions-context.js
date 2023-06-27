@@ -5,16 +5,35 @@ import { createContext, useReducer } from "react";
 
 export const ExhibitionsContext = createContext({
     exhibitions: [],
+    setExhibitions: (exhibitions) => {},
 });
 
 function exhibitionsReducer(state, action) {
-
+    switch (action.type) {
+        case 'SET':
+            return action.payload;
+        default:
+            return state;
+    }
 }
 
 function ExhibitionsContextProvider({children}) {
-    useReducer();
+    const [exhibitionsState, dispatch] = useReducer(exhibitionsReducer, []);
 
-    return <ExhibitionsContext.Provider>{children}</ExhibitionsContext.Provider>
+    function setExhibitions(exhibitions) {
+        dispatch({type: 'SET', payload: exhibitions});
+    }
+
+    const value = {
+        exhibitions: exhibitionsState,
+        setExhibitions: setExhibitions,
+    };
+
+    return (
+        <ExhibitionsContext.Provider value={value}>
+            {children}
+        </ExhibitionsContext.Provider>
+    );
 }
 
 export default ExhibitionsContextProvider;

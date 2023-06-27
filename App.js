@@ -13,6 +13,7 @@ import MapScreen from './screens/MapScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import FavoriteScreen from './screens/FavoriteScreen';
 import InfromationScreen from './screens/InformationScreen';
+import ExhibitionsContextProvider from './store/exhibitions-context';
 
 
 const BottomNavigator = createBottomTabNavigator();
@@ -65,16 +66,18 @@ export default function App() {
     <>
       <StatusBar style='light' />
       <SafeAreaView style={styles.rootScreen}>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="ExhibitionsOverview" component={ExhibitionsOverview} options={{ headerShown: false}}/>
-            <Stack.Screen name="InformationScreen" component={InfromationScreen} options={{
-              headerStyle: { backgroundColor: '#A3A098'},
-              headerTitleStyle: styles.headerText,
-              headerTitle: 'Art Calendar:Seoul'
-            }} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <ExhibitionsContextProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="ExhibitionsOverview" component={ExhibitionsOverview} options={{ headerShown: false}}/>
+              <Stack.Screen name="InformationScreen" component={InfromationScreen} options={{
+                headerStyle: { backgroundColor: '#A3A098'},
+                headerTitleStyle: styles.headerText,
+                headerTitle: 'Art Calendar:Seoul'
+              }} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ExhibitionsContextProvider>
       </SafeAreaView>
     </>
   );
