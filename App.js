@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar'; // 맨 위에 시간, 배터리...
 import { SafeAreaView, StyleSheet } from 'react-native'; // 아이폰 노치 (SafeAreaView)
 import { NavigationContainer } from '@react-navigation/native'; // navigator 쓰기 위해서 필요
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // bottom navigator
+import { createNativeStackNavigator } from '@react-navigation/native-stack'; // stack navigator
 
 import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
@@ -11,8 +12,12 @@ import MainScreen from './screens/MainScreen';
 import MapScreen from './screens/MapScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import FavoriteScreen from './screens/FavoriteScreen';
+import InfromationScreen from './screens/InformationScreen';
+import ExhibitionsContextProvider from './store/exhibitions-context';
+
 
 const BottomNavigator = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 function ExhibitionsOverview(pressed) { // 네비게이터 설정 함수
   return (
@@ -61,9 +66,18 @@ export default function App() {
     <>
       <StatusBar style='light' />
       <SafeAreaView style={styles.rootScreen}>
-        <NavigationContainer>
-          <ExhibitionsOverview />
-        </NavigationContainer>
+        <ExhibitionsContextProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="ExhibitionsOverview" component={ExhibitionsOverview} options={{ headerShown: false}}/>
+              <Stack.Screen name="InformationScreen" component={InfromationScreen} options={{
+                headerStyle: { backgroundColor: '#A3A098'},
+                headerTitleStyle: styles.headerText,
+                headerTitle: 'Art Calendar:Seoul'
+              }} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ExhibitionsContextProvider>
       </SafeAreaView>
     </>
   );
@@ -72,5 +86,12 @@ export default function App() {
 const styles = StyleSheet.create({
   rootScreen: {
     flex: 1
+  },
+  headerText: {
+    fontSize: 24,
+    color: 'white',
+    textAlign: 'center',
+    paddingTop: 45,
+    paddingBottom: 15,
   }
 });

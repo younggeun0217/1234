@@ -1,14 +1,49 @@
 // 전시 ~ find, 돋보기 이미지까지 검색 옵션들
 import { useState } from "react";
-import { Text, View, StyleSheet, TextInput, ScrollView, Platform, Pressable } from "react-native";
+import { Text, View, StyleSheet, TextInput, ScrollView, Pressable, Alert } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { Entypo } from '@expo/vector-icons'; // expo icons 이미지
 import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
 import DistrictModal from "./DistrictModal"; // SearchOption에서 Modal 관리
+import DateTimePicker from '@react-native-community/datetimepicker'; // 달력에서 날짜 선택
 
 function SearchOptionList() {
     const [district, setDistrict] = useState(['']); // 서울 지역구 배열(List)
     const [modalIsVisible, setModalIsVisible] = useState(false); // 구 input칸 클릭 시 나오는 modal (true / false)
+    
+    const [startDate, setStartDate] = useState(new Date()); // 시작일
+    const [endDate, setEndDate] = useState(() => { // 종료일 (시작일 + 30일)
+        const nextDate = new Date(startDate);
+        nextDate.setDate(startDate.getDate() + 30);
+        return nextDate;
+    });
+    const [showStartPicker, setShowStartPicker] = useState(false);
+    const [showEndPicker, setShowEndPicker] = useState(false); 
+    
+    function showStartDateTimePicker() {
+        setShowStartPicker(true);
+    };
+
+    function showEndDateTimePicker() {
+        setShowEndPicker(true);
+      }
+
+    const handleStartDateChange = (event, selectedDate) => { // 캘린더 handler
+        const currentDate = selectedDate || startDate;
+        setShowStartPicker(false);
+        setStartDate(currentDate);
+    }
+
+    const handleEndDateChange = (event, selectedDate) => { // 캘린더 handler
+        const currentDate = selectedDate || endDate;
+        setShowEndPicker(false);
+
+        if (currentDate < startDate) {
+            Alert.alert('종료일이 시작일 보다 과거입니다.', '기간을 다시 선택해주십시오.' )
+        } else {
+            setEndDate(currentDate);
+        }
+    }
 
     function DistrictList({districts}) { // 서울 지역구 출력 함수
         return <Text style={styles.districtItems}>{districts}</Text>;
@@ -25,7 +60,10 @@ function SearchOptionList() {
     function handleSetDistrict(districts) { // district 상태를 handling하는 함수
         setDistrict(districts);
     }
-    
+
+    const formattedStartDate = startDate.toISOString().split('T')[0]; // startDate 포맷 YYYY-MM-DD
+    const formattedEndDate = endDate.toISOString().split('T')[0]; // endDate 포맷 YYYY-MM-DD
+
     return (
         <View style={styles.screen}> 
             <View style={styles.subTitle1}>
@@ -39,7 +77,7 @@ function SearchOptionList() {
                     contentContainerStyle={styles.scrollViewContent}
                     horizontal={true}
                 >
-                {district.map((item, index) => (<DistrictList key={index} districts={item} />))}
+                    {district.map((item, index) => (<DistrictList key={index} districts={item} />))}
                 </ScrollView>
                 <Pressable>
                     <Entypo name="triangle-right" size={24} color="#A3A098" onPress={openModal} />
@@ -51,16 +89,28 @@ function SearchOptionList() {
                 onSelectedDistrictList={handleSetDistrict}    
             />
             <View style={styles.subTitle2}>
-                <Pressable>
-                    <Text style={styles.districtItems}>2023-03-01</Text>
+                <Pressable onPress={showStartDateTimePicker}>
+                    <Text style={styles.districtItems}>{formattedStartDate}</Text>
+                    {showStartPicker && (
+                        <DateTimePicker
+                            value={startDate}
+                            mode="date"
+                            onChange={handleStartDateChange}
+                        />
+                    )}
                 </Pressable>
                 <Text style={styles.districtText}>~</Text>
-                <Pressable>
-                    <Text style={styles.districtItems}>2023-06-01</Text>
+                <Pressable onPress={showEndDateTimePicker}>
+                    <Text style={styles.districtItems}>{formattedEndDate}</Text>
+                    {showEndPicker && (
+                        <DateTimePicker
+                            value={endDate}
+                            mode="date"
+                            onChange={handleEndDateChange}
+                        />
+                    )}
                 </Pressable>
-                <Pressable>
-                    <MaterialCommunityIcons name="calendar-multiple" size={24} color="#A3A098" />
-                </Pressable>
+                <MaterialCommunityIcons name="calendar-multiple" size={24} color="#A3A098" />
             </View>
             <View style={styles.search}>
                 <Pressable style={styles.searchUi}>
@@ -129,4 +179,10 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         color: 'white'
     },    
+    testStyle1: {
+        backgroundColor: 'black'
+    },
+    textStyle2: {
+        backgroundColor: 'red'
+    }
 });
