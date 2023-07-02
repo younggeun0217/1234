@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 // }
 
 function SearchItems({result}) {
-    const { id, title, exhibition, startDate, endDate, thumbnail } = result; // result객체를 분해
+    const { title, thumbnail, exhibition, startDate, endDate, time, restDay, fee, callNumber, siteAddress, mainAuthor, otherAuthors,imageInformations, textInformation } = result; // result객체를 분해
     // const truncatedTitle = truncateText(title, 18); // 전시회 제목 글자 수 제한
     // const truncatedLocation = truncateText(location, 18); // 전시회 장소 글자 수 제한
 
@@ -18,7 +18,20 @@ function SearchItems({result}) {
 
     function exhivitionPressHandler() {
         navigation.navigate('InformationScreen', {
-            exhibitionId: id
+            title: title,
+            thumbnail: thumbnail,
+            exhibition: exhibition,
+            startDate: startDate,
+            endDate: endDate,
+            time: time,
+            restDay: restDay,
+            fee: fee,
+            callNumber: callNumber,
+            siteAddress: siteAddress,
+            mainAuthor: mainAuthor,
+            otherAuthors: otherAuthors,
+            imageInformations: imageInformations,
+            textInformation: textInformation,
         });
     }
 
