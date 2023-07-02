@@ -1,5 +1,5 @@
 // 전시회 상세정보 screen
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import { Entypo } from '@expo/vector-icons'; // 공유 이미지 import
 import { useState } from "react";
@@ -36,6 +36,8 @@ function InfromationScreen({route}) {
         if (siteAddress !== null) {
             const url = siteAddress
             Linking.openURL(url);
+        } else {
+            Alert.alert('홈페이지 정보가 없습니다.', '전시회 관련 홈페이지가 존재하지 않습니다.');
         }
     }
 
