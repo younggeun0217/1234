@@ -10,11 +10,20 @@ export async function fetchExhibitions() {
     for (const key in response.data) {
         const exhibitionsObject = {
             id: key,
-            thumbnail: response.data[key].thumbnail,
             title: response.data[key].title,
+            thumbnail: response.data[key].thumbnail,
             exhibition: response.data[key].exhibition,
             startDate: response.data[key].startDate,
-            endDate: response.data[key].endDate
+            endDate: response.data[key].endDate,
+            time: response.data[key].time,
+            restDay: response.data[key].restDay,
+            fee: response.data[key].fee,
+            callNumber: response.data[key].callNumber,
+            siteAddress: response.data[key].siteAddress,
+            mainAuthor: response.data[key].mainAuthor,
+            otherAuthors: response.data[key].otherAuthors,
+            imageInformations: response.data[key].imageInformations,
+            textInformation: response.data[key].textInformation
         };
         exhibitions.push(exhibitionsObject);
     }
