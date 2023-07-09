@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Text, View, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import SearchOptions from "./SearchOptions"; // 검색 옵션들
-import SearchResult from "./SearchResult"; // 검색 결과
 
 function Search() {
     const [pressed, setPressed] = useState(false); // 눌렀는지 확인
@@ -15,13 +14,12 @@ function Search() {
     return (
         <View style={styles.screen}>
             <View style={styles.title}>
-                <Text style={styles.titleText}>Find Exhibition</Text>
+                <Text style={styles.titleText}>전시회 검색</Text>
                 <Pressable onPress={showOptionHandler}>
                     <Ionicons name={[pressed ? "caret-down-outline" : "caret-forward-outline"]} size={24} color="#A3A098" />
                 </Pressable>
             </View>
-            {pressed ? <SearchOptions /> : null}
-            <SearchResult pressed={pressed} />
+            <SearchOptions pressed={pressed} />
         </View>
     );
 }   

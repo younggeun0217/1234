@@ -4,7 +4,7 @@ import { Modal, View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from
 
 import {DISTRICT} from '../../data/seoulDistrict'; // 서울 지역구 list 가져옮
 
-function DistrictModal({pressed, onCancel, onSelectedDistrictList}) { // 메인 함수
+function DistrictModal({pressed, onCancel, onSelectedDistrictList}) { 
     const [selectedDistrictList, setSelectedDistrictList] = useState([]); // 선택된 지역구들
 
     function selectDistrict({district}) { // id와 name을 객체로 받아옮 + 지역구 선택 안하면 추가, 이미 선택 했으면 없애는 함수
@@ -27,10 +27,11 @@ function DistrictModal({pressed, onCancel, onSelectedDistrictList}) { // 메인 
         });
     }
 
-    useEffect(() => { // 리스트에서 선택할 때 마다 SearchOptions에 list 전달
-        onSelectedDistrictList(selectedDistrictList);
-    }, [selectedDistrictList]);
-      
+    useEffect(() => {
+        if (pressed && selectedDistrictList.length > 0) {
+          onSelectedDistrictList(selectedDistrictList);
+        }
+    }, [selectedDistrictList, pressed]);
 
     return( 
         <>
