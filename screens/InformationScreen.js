@@ -1,10 +1,15 @@
 // 전시회 상세정보 screen
 import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+
+import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import { Entypo } from '@expo/vector-icons'; // 공유 이미지 import
-import { useState } from "react";
 
 function InfromationScreen({route}) {
+    const navigation = useNavigation();
+
     const title = route.params?.title; // 제목
     const thumbnail = route.params?.thumbnail; // 섬네일 링크
     const exhibition = route.params?.exhibition; // 전시회관
@@ -54,6 +59,22 @@ function InfromationScreen({route}) {
         <>
             <ScrollView>
                 <View style={styles.rootContainer}>
+                    <View style={styles.headerBox}>
+                        <Ionicons
+                            name="arrow-back"
+                            size={36}
+                            color="black"
+                            style={{ marginLeft: 10 }}
+                            onPress={() => navigation.goBack()} 
+                        />
+                        <Ionicons
+                            name="home-outline"
+                            size={36}
+                            color="black"
+                            style={{ marginRight: 10 }}
+                            onPress={() => navigation.navigate('ExhibitionsOverview')}
+                        />
+                    </View>
                     <Text style={styles.headerText}>{title}</Text>
                     <Image style={styles.thumbnail} resizeMode="contain" source={{ uri: thumbnail }} />
                     <View style={styles.informationContainer}>
@@ -101,6 +122,11 @@ const deviceHeight = Dimensions.get('window').height; // 사용 기기 height
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
+        marginTop: '10%'
+    },
+    headerBox: {
+        flexDirection: "row",
+        justifyContent: "space-between"
     },
     headerText: {
         fontSize: 25,

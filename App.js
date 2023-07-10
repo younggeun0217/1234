@@ -71,9 +71,8 @@ export default function App() {
             <Stack.Navigator>
               <Stack.Screen name="ExhibitionsOverview" component={ExhibitionsOverview} options={{ headerShown: false}}/>
               <Stack.Screen name="InformationScreen" component={InfromationScreen} options={{
-                headerStyle: { backgroundColor: '#A3A098'},
-                headerTitleStyle: styles.headerText,
-                headerTitle: 'Art Calendar:Seoul'
+                headerShown: false,
+                headerBackTitleVisible: false,
               }} />
             </Stack.Navigator>
           </NavigationContainer>

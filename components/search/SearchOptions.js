@@ -10,9 +10,10 @@ import DateTimePicker from '@react-native-community/datetimepicker'; // 달력�
 import SearchItems from "./SearchItems"; // SearchResult에서 SearchItems를 핸들링
 import { ExhibitionsContext } from "../../store/exhibitions-context";
 import { fetchExhibitions } from "../../DB/firebase";
+import LoadingOverlay from "../../ui/LoadingOverlay";
 
 function SearchOptions({pressed}) {
-    const [exhibitionName, setExhibitionName] = useState('');
+    const [exhibitionTitle, setExhibitionTitle] = useState('');
     const [exhibitionLocation, setExhibitionLocation] = useState('');
     const [district, setDistrict] = useState();
 
@@ -74,6 +75,7 @@ function SearchOptions({pressed}) {
     // 여기서부터 검색 결과
     const [isFetching, setIsFetching] = useState(true);
     const [error, setError] = useState();
+    const [find, setFind] = useState(false);
 
     const exhibitionsCtx = useContext(ExhibitionsContext);
 
@@ -82,7 +84,8 @@ function SearchOptions({pressed}) {
             console.log('실행');
             setIsFetching(true);
             try {
-                const exhibitions = await fetchExhibitions();
+                exhibitionsCtx.setExhibitions(null);
+                const exhibitions = await fetchExhibitions(exhibitionTitle, exhibitionLocation, district);
                 exhibitionsCtx.setExhibitions(exhibitions);
             } catch(error) {
                 setError('Error');
@@ -90,18 +93,19 @@ function SearchOptions({pressed}) {
             setIsFetching(false);
         }
         getExhibitions();
-    }, []);
+    }, [find]);
 
     function errorHandler() {
         setError(null);
     }
 
-    if (error && !isFetching) { // 추후 에러 화면 작성 예정
-        return <Text>에러남</Text>;
+    function findExhibition() {
+        setFind(!find);
     }
 
+
     if (isFetching) { // 추후 로딩중 텍스트(화면) 작성 예정
-        return <Text>로딩중</Text>;
+        return <LoadingOverlay />;
     }
 
     const resultExhibitions = exhibitionsCtx.exhibitions;
@@ -136,8 +140,8 @@ function SearchOptions({pressed}) {
                     <TextInput 
                         style={styles.subTitleText} 
                         placeholder="전시회 이름을 검색해보세요. (선택)"
-                        value={exhibitionName}
-                        onChangeText={text => setExhibitionName(text)}    
+                        value={exhibitionTitle}
+                        onChangeText={text => setExhibitionTitle(text)}    
                     />
                 </View>
                 <View style={styles.subTitle1}>
@@ -189,7 +193,7 @@ function SearchOptions({pressed}) {
                     <MaterialCommunityIcons name="calendar-multiple" size={24} color="#A3A098" />
                 </View>
                 <View style={styles.search}>
-                    <Pressable style={styles.searchUi}>
+                    <Pressable style={styles.searchUi} onPress={findExhibition}>
                         <Text style={styles.searchFont}>검색하기</Text>
                     </Pressable>
                     <Pressable>

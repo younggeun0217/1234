@@ -1,6 +1,12 @@
 // 검색 결과 이미지, title, 장소, 날짜, 전시중
+import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
+import { postDataInUserDB } from "../../DB/firebase"; // userDB에 추가
+import { findAndDeleteInUserDB } from "../../DB/firebase"; // userDB에서 삭제
+
+import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 
 // function truncateText(text, maxLength) { // 전시회 검색 결과 텍스트들 글자 길이 설정
 //     if (text.length > maxLength) {
@@ -15,6 +21,21 @@ function SearchItems({result}) {
     // const truncatedLocation = truncateText(location, 18); // 전시회 장소 글자 수 제한
 
     const navigation = useNavigation();
+
+    const [onGoing, setOnGoing] = useState('전시중');
+    const [isLike, setIsLike] = useState(false); // 좋아요 상태
+
+    useEffect(() => {
+        if(isLike == true) {
+            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+        } else {
+            findAndDeleteInUserDB(title);
+        }
+    }, [isLike]);
+
+    function likeHandler() {
+        setIsLike(!isLike);
+    }
 
     function exhivitionPressHandler() {
         navigation.navigate('InformationScreen', {
@@ -45,7 +66,10 @@ function SearchItems({result}) {
                             <Text style={styles.text}>{title}</Text>
                             <Text style={styles.text}>{exhibition}</Text>
                             <Text style={styles.text}>{startDate} ~ {endDate}</Text>
-                            <Text style={styles.onGoing}>전시중</Text>
+                            <View style={styles.heartBox}>
+                                <Text style={styles.onGoing}>{onGoing}</Text>
+                                <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={24} color="red" onPress={likeHandler} />
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -81,5 +105,9 @@ const styles = StyleSheet.create({
     },
     onGoing: { // 전시중일 때 글자 색 red
         color: 'red'
+    },
+    heartBox: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
