@@ -1,7 +1,9 @@
 // 전시회 상세정보 screen
 import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+
+import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
 
 import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
@@ -31,11 +33,21 @@ function InfromationScreen({route}) {
     Authors += ',' + otherAuthors;
     }
 
-    const [isPressed, setIsPressed] = useState(false); // 좋아요 상태
+    const [isLike, setIsLike] = useState(false); // 좋아요 상태
 
-    function pressHandler() { // 좋아요 클릭
-        setIsPressed(!isPressed);
-    }
+    function likeHandler() {
+        setIsLike(!isLike);
+        if (!isLike) {
+            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+        } else {
+            findAndDeleteInUserDB(title);
+        }
+    };
+
+    useEffect(() => {
+        findIsLike(title, setIsLike);
+    }, []);
+
 
     function linkHompepageHandler() {
         if (siteAddress !== null) {
@@ -102,7 +114,7 @@ function InfromationScreen({route}) {
             <View style={styles.footer}>
                 <View style={styles.footerIconBox}>
                     <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
-                    <AntDesign style={styles.footerIcons} name={isPressed ? "heart" : "hearto"} size={36} color="red" onPress={pressHandler} />
+                    <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={36} color="red" onPress={likeHandler} />
                 </View>
                 <View style={styles.footerTextBox}>
                     <TouchableOpacity onPress={linkHompepageHandler}>

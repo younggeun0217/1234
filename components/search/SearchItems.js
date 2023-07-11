@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { postDataInUserDB } from "../../DB/firebase"; // userDB에 추가
-import { findAndDeleteInUserDB } from "../../DB/firebase"; // userDB에서 삭제
+import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../../DB/firebase"; // DB 관련 기능
 
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 
@@ -25,17 +24,20 @@ function SearchItems({result}) {
     const [onGoing, setOnGoing] = useState('전시중');
     const [isLike, setIsLike] = useState(false); // 좋아요 상태
 
-    useEffect(() => {
-        if(isLike == true) {
-            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
-        } else {
-            findAndDeleteInUserDB(title);
-        }
-    }, [isLike]);
-
     function likeHandler() {
         setIsLike(!isLike);
-    }
+        if (!isLike) {
+            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+            console.log(isLike);
+        } else {
+            findAndDeleteInUserDB(title);
+            console.log(isLike);
+        }
+    };
+
+    useEffect(() => {
+        findIsLike(title, setIsLike);
+    }, []);
 
     function exhivitionPressHandler() {
         navigation.navigate('InformationScreen', {

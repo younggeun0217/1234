@@ -57,6 +57,11 @@ function SearchOptions({pressed}) {
         return <Text style={styles.districtItems}>{districts}</Text>;
     }
 
+    function NoneDistrict() {
+        if (district === undefined) 
+            return <Text style={styles.noneDistrictText}>지역구를 선택해주세요.(선택)</Text>;
+    }
+
     function openModal() { // Modal 열기
         setModalIsVisible(true);
     }
@@ -85,7 +90,7 @@ function SearchOptions({pressed}) {
             setIsFetching(true);
             try {
                 exhibitionsCtx.setExhibitions(null);
-                const exhibitions = await fetchExhibitions(exhibitionTitle, exhibitionLocation, district);
+                const exhibitions = await fetchExhibitions(exhibitionTitle, exhibitionLocation, district, startDate, endDate);
                 exhibitionsCtx.setExhibitions(exhibitions);
             } catch(error) {
                 setError('Error');
@@ -103,11 +108,6 @@ function SearchOptions({pressed}) {
         setFind(!find);
     }
 
-
-    if (isFetching) { // 추후 로딩중 텍스트(화면) 작성 예정
-        return <LoadingOverlay />;
-    }
-
     const resultExhibitions = exhibitionsCtx.exhibitions;
 
     const renderItem = ({ item }) => (
@@ -115,6 +115,11 @@ function SearchOptions({pressed}) {
             <SearchItems result={item} />
         </View>
     );
+
+    if (isFetching) { // 로딩중 화면
+        return <LoadingOverlay />;
+    }
+
 
     if (!pressed) {
         return (
@@ -157,6 +162,7 @@ function SearchOptions({pressed}) {
                         contentContainerStyle={styles.scrollViewContent}
                         horizontal={true}
                     >
+                        <NoneDistrict />
                         {district && district.map((item, index) => (<DistrictList key={index} districts={item} />))}
                     </ScrollView>
                     <Pressable>
@@ -239,7 +245,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     subTitleText: { // 옵션에 작성되는 텍스트
-        color: 'black',
         fontSize: 18
     },
     districtItems: { // 지역구, 날짜 border, fontsize...
@@ -249,6 +254,10 @@ const styles = StyleSheet.create({
         marginVertical: 3,
         backgroundColor: 'rgba(163, 160, 152, 0.1)',
         borderRadius: 16,
+    },
+    noneDistrictText: {
+        fontSize: 18,
+        color: '#4A4A4A',
     },
     districtText: { // ~ << css
         fontSize: 16,

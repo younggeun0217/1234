@@ -1,22 +1,37 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DATABASE_URL = 'https://art-calendar-7d7e6-default-rtdb.firebaseio.com';
 
-const userId = uuidv4();
+async function getUserId() { // userId 생성 및 get
+    let userId = await AsyncStorage.getItem('userId');
+  
+    if (!userId) {
+      userId = uuidv4();
+      await AsyncStorage.setItem('userId', userId);
+    }
+  
+    return userId;
+}
 
-export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, district) { // 데이터 출력하는 함수
+export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, district, startDate, endDate) { // 데이터 출력하는 함수
     const response = await axios.get(DATABASE_URL + '/exhibitions.json');
-    console.log(exhibitionTitle);
-    console.log(exhibitionLocation);
-    console.log(district);
     const exhibitions = [];
-    
+    // const startDate1 = startDate;
+    // const endDate1 = endDate;
+
     for (const key in response.data) {
         const exhibition = response.data[key];
         const exhibitionDistrict = extractDistrictFromLocation(exhibition.location);
+        // const startDate2 = exhibition.startDate;
+        // const endDate2 = exhibition.endDate;
+        
+        // 날짜 비교 코드 작성중
+        // const exhibitionStartDate = new Date(startDate2.replace(/\./g, '-'));
+        // const exhibitionEndDate = new Date(endDate2.replace(/\./g, '-'));
 
-        if (
+        if ( // 검색 코드
             (!district || district.some(d => exhibitionDistrict.toLowerCase().includes(d.toLowerCase())))
             && (!exhibitionTitle || exhibition.title.toLowerCase().includes(exhibitionTitle.toLowerCase()))
             && (!exhibitionLocation || exhibition.exhibition.toLowerCase().includes(exhibitionLocation.toLowerCase()))
@@ -37,7 +52,7 @@ export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, dist
                 mainAuthor: exhibition.mainAuthor,
                 otherAuthors: exhibition.otherAuthors,
                 imageInformations: exhibition.imageInformations,
-                textInformation: exhibition.textInformation
+                textInformation: exhibition.textInformation,
             };
             exhibitions.push(exhibitionObject);
         }
@@ -45,13 +60,15 @@ export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, dist
     return exhibitions;
 }
 
-export async function postDataInUserDB(title, thumbnail, exhibition, startDate, endDate) { // 유저DB에 저장하는 함수
+export async function postDataInUserDB(title, thumbnail, exhibition, startDate, endDate, isLike='true') { // 유저DB에 저장하는 함수
+    const userId = await getUserId();
     const newData = {
         title,
         thumbnail,
         exhibition,
         startDate,
         endDate,
+        isLike
     };
 
     try {
@@ -62,7 +79,8 @@ export async function postDataInUserDB(title, thumbnail, exhibition, startDate, 
     }
 }
 
-export async function findAndDeleteInUserDB(title) {
+export async function findAndDeleteInUserDB(title) { // 좋아요 삭제 코드
+    const userId = await getUserId();
     try {
         const response = await axios.get(DATABASE_URL+ `/users/${userId}.json`);
         const data = response.data;
@@ -80,7 +98,25 @@ export async function findAndDeleteInUserDB(title) {
     }
 }
 
-function extractDistrictFromLocation(location) { // 지역구 위치 찾기위한 함수
+export async function findIsLike(title, callback) { // 좋아요 인지 확인하는 함수
+    const userId = await getUserId();
+    try {
+        const response = await axios.get(DATABASE_URL+ `/users/${userId}.json`);
+        const data = response.data;
+
+        for (const key in data) {
+            const exhibit = data[key];
+            if (exhibit.title === title) {
+                callback(exhibit.isLike); 
+                break; 
+            }
+        }
+    } catch(error) {
+        console.error('유저 DB 조회 후 좋아요 리스트 찾는 도중 에러가 발생하였습니다. :', error);
+    }
+}
+
+function extractDistrictFromLocation(location) { // 지역구 DB에서 위치 찾기위한 함수
     const parts = location.split(' ');
     if (parts.length > 1) {
         return parts[1]; 
