@@ -1,10 +1,17 @@
 // 전시회 상세정보 screen
 import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
+import { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+
+import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
+
+import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import { Entypo } from '@expo/vector-icons'; // 공유 이미지 import
-import { useState } from "react";
 
 function InfromationScreen({route}) {
+    const navigation = useNavigation();
+
     const title = route.params?.title; // 제목
     const thumbnail = route.params?.thumbnail; // 섬네일 링크
     const exhibition = route.params?.exhibition; // 전시회관
@@ -26,11 +33,21 @@ function InfromationScreen({route}) {
     Authors += ',' + otherAuthors;
     }
 
-    const [isPressed, setIsPressed] = useState(false); // 좋아요 상태
+    const [isLike, setIsLike] = useState(false); // 좋아요 상태
 
-    function pressHandler() { // 좋아요 클릭
-        setIsPressed(!isPressed);
-    }
+    function likeHandler() {
+        setIsLike(!isLike);
+        if (!isLike) {
+            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+        } else {
+            findAndDeleteInUserDB(title);
+        }
+    };
+
+    useEffect(() => {
+        findIsLike(title, setIsLike);
+    }, []);
+
 
     function linkHompepageHandler() {
         if (siteAddress !== null) {
@@ -54,6 +71,22 @@ function InfromationScreen({route}) {
         <>
             <ScrollView>
                 <View style={styles.rootContainer}>
+                    <View style={styles.headerBox}>
+                        <Ionicons
+                            name="arrow-back"
+                            size={36}
+                            color="black"
+                            style={{ marginLeft: 10 }}
+                            onPress={() => navigation.goBack()} 
+                        />
+                        <Ionicons
+                            name="home-outline"
+                            size={36}
+                            color="black"
+                            style={{ marginRight: 10 }}
+                            onPress={() => navigation.navigate('ExhibitionsOverview')}
+                        />
+                    </View>
                     <Text style={styles.headerText}>{title}</Text>
                     <Image style={styles.thumbnail} resizeMode="contain" source={{ uri: thumbnail }} />
                     <View style={styles.informationContainer}>
@@ -81,7 +114,7 @@ function InfromationScreen({route}) {
             <View style={styles.footer}>
                 <View style={styles.footerIconBox}>
                     <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
-                    <AntDesign style={styles.footerIcons} name={isPressed ? "heart" : "hearto"} size={36} color="red" onPress={pressHandler} />
+                    <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={36} color="red" onPress={likeHandler} />
                 </View>
                 <View style={styles.footerTextBox}>
                     <TouchableOpacity onPress={linkHompepageHandler}>
@@ -101,6 +134,11 @@ const deviceHeight = Dimensions.get('window').height; // 사용 기기 height
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
+        marginTop: '10%'
+    },
+    headerBox: {
+        flexDirection: "row",
+        justifyContent: "space-between"
     },
     headerText: {
         fontSize: 25,
