@@ -64,7 +64,7 @@ export default function App() {
 
   return (
     <>
-      <StatusBar style='light' />
+      <StatusBar style='black' />
       <SafeAreaView style={styles.rootScreen}>
         <ExhibitionsContextProvider>
           <NavigationContainer>
