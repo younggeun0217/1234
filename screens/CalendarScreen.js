@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Text  } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { Feather } from '@expo/vector-icons'; // 화살표 이미지
+import MemoListModal from '../components/Calendar/MemoListModal';
 
 
 function CalendarScreen() {
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString);
+    setIsModalVisible(true);
+  };
+
   const getMarked = (schedules, highlightedDate) => {
     let marked = { ...highlightedDate };
 
@@ -55,7 +65,7 @@ function CalendarScreen() {
   return (
       <View style={styles.root}>
       <View>
-        <Text style={styles.paramText}>전시회 일정</Text>
+        <Text style={styles.paramText}>관심등록 전시회 일정</Text>
         <View style={[styles.paramBox, {backgroundColor: 'rgba(255, 0, 0, 0.5)'}, {borderBottomWidth: 0}]}>
           <Text style={styles.paramTexts}>Param</Text>
         </View>
@@ -104,7 +114,7 @@ function CalendarScreen() {
               }
             }
           }}
-          onDayPress={(day) => console.log('onDayPress', day.dateString)}
+          onDayPress={handleDayPress}
           markingType="multi-period"
           markedDates={markedDates}
           renderArrow={(direction) => {
@@ -118,6 +128,9 @@ function CalendarScreen() {
               );
           }}
         />
+        {isModalVisible && (
+          <MemoListModal selectedDate={selectedDate} onClose={() => setIsModalVisible(false)} />
+        )}
       </View>
     </View>
   );
