@@ -15,7 +15,6 @@ import FavoriteScreen from './screens/FavoriteScreen';
 import InfromationScreen from './screens/InformationScreen';
 import ExhibitionsContextProvider from './store/exhibitions-context';
 
-
 const BottomNavigator = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 

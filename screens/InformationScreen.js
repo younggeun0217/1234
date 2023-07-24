@@ -1,7 +1,8 @@
 // 전시회 상세정보 screen
 import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+
 // import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
 import { saveLikedExhibition, deleteLikedExhibition, findLikedExhibition } from "../DB/localStorage";
 
@@ -56,6 +57,10 @@ function InfromationScreen({route}) {
             deleteLikedExhibition(title);
         }
     }
+
+    useEffect(() => {
+        findLikedExhibition(title, setIsLike);
+    }, []);
 
     function linkHompepageHandler() {
         if (siteAddress !== null) {
