@@ -1,9 +1,9 @@
 // 전시회 상세정보 screen
 import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-
-import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
+// import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
+import { saveLikedExhibition, deleteLikedExhibition, findLikedExhibition } from "../DB/localStorage";
 
 import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
@@ -35,19 +35,27 @@ function InfromationScreen({route}) {
 
     const [isLike, setIsLike] = useState(false); // 좋아요 상태
 
+    // function likeHandler() {
+    //     setIsLike(!isLike);
+    //     if (!isLike) {
+    //         postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+    //     } else {
+    //         findAndDeleteInUserDB(title);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     findIsLike(title, setIsLike);
+    // }, []);
+
     function likeHandler() {
         setIsLike(!isLike);
         if (!isLike) {
-            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+            saveLikedExhibition(title, thumbnail, exhibition, startDate, endDate);
         } else {
-            findAndDeleteInUserDB(title);
+            deleteLikedExhibition(title);
         }
-    };
-
-    useEffect(() => {
-        findIsLike(title, setIsLike);
-    }, []);
-
+    }
 
     function linkHompepageHandler() {
         if (siteAddress !== null) {

@@ -1,9 +1,10 @@
 // 검색 결과 이미지, title, 장소, 날짜, 전시중
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../../DB/firebase"; // DB 관련 기능
+import { deleteLikedExhibition, saveLikedExhibition } from "../../DB/localStorage";
+// import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../../DB/firebase"; // DB 관련 기능
 
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 
@@ -24,20 +25,29 @@ function SearchItems({result}) {
     const [onGoing, setOnGoing] = useState('전시중');
     const [isLike, setIsLike] = useState(false); // 좋아요 상태
 
+    // function likeHandler() {
+    //     setIsLike(!isLike);
+    //     if (!isLike) {
+    //         postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
+    //         console.log(isLike);
+    //     } else {
+    //         findAndDeleteInUserDB(title);
+    //         console.log(isLike);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     findIsLike(title, setIsLike);
+    // }, []);
+
     function likeHandler() {
         setIsLike(!isLike);
         if (!isLike) {
-            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
-            console.log(isLike);
+            saveLikedExhibition(title, thumbnail, exhibition, startDate, endDate);
         } else {
-            findAndDeleteInUserDB(title);
-            console.log(isLike);
+            deleteLikedExhibition(title);
         }
-    };
-
-    useEffect(() => {
-        findIsLike(title, setIsLike);
-    }, []);
+    }
 
     function exhivitionPressHandler() {
         navigation.navigate('InformationScreen', {
