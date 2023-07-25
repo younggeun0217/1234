@@ -14,7 +14,7 @@ function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText,
             </TouchableOpacity>
           </View>
           <Text style={{ fontSize: 20, marginBottom: 20 }}>{selectedScheduleTitle}</Text>
-          <Text style={{fontsize:16}}>메모</Text>
+          <Text style={{fontSize:16}}>메모</Text>
           <TextInput
             style={styles.memoInput}
             placeholder="메모를 입력하세요."

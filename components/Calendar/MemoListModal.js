@@ -15,9 +15,9 @@ function MemoListModal({ selectedDate, onClose }) {
   console.log(formattedDate); 
 
   const schedule = [
-    { id: 1, title: 'Param', memo: '이날 관람하기' },
-    { id: 2, title: '피카소와 20세기 거장들', memo: '커피 먹기' },
-    { id: 3, title: '알렉스 도지 : 퍼스널 데이', memo: '' },
+    { id: 1, title: '참조점', memo: '이날 관람하기' },
+    { id: 2, title: '강우솔, 임아진:(불)응하는 몸', memo: '커피 먹기' },
+    { id: 3, title: 'Param', memo: '' },
   ];
 
   const handleMemoPress = (id) => {
