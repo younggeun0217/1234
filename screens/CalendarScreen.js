@@ -72,7 +72,7 @@ function CalendarScreen() {
   // 강조 07월 04일
   // 여기에 하드코딩 된 객체 교체
   const highlightedDate = {
-    "2023-07-08": { selected: true, selectedColor: "#B8B5AD" },
+    "2023-07-12": { selected: true, selectedColor: "#B8B5AD" },
     "2023-07-18": { selected: true, selectedColor: "#B8B5AD" },
   };
 
@@ -117,7 +117,16 @@ function CalendarScreen() {
                 },
               },
             }}
-
+            renderArrow={(direction) => {
+              if (direction == "left")
+                return (
+                  <Feather name="arrow-left" size={30} color="skyblue" />
+                );
+              if (direction == "right")
+                return (
+                  <Feather name="arrow-right" size={30} color="skyblue" />
+                );
+            }}
       /> 
         {isModalVisible && (
           <MemoListModal selectedDate={selectedDate} onClose={() => setIsModalVisible(false)} />
