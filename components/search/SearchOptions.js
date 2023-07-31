@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { Text, View, StyleSheet, TextInput, ScrollView, Pressable, Alert, FlatList } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { Entypo } from '@expo/vector-icons'; // expo icons 이미지
-import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
+import { FontAwesome } from '@expo/vector-icons'; // 새로고침 이미지
 
 import DistrictModal from "./DistrictModal"; // SearchOption에서 Modal 관리
 import DateTimePicker from '@react-native-community/datetimepicker'; // 달력에서 날짜 선택
@@ -15,7 +15,7 @@ import LoadingOverlay from "../../ui/LoadingOverlay";
 function SearchOptions({pressed}) {
     const [exhibitionTitle, setExhibitionTitle] = useState('');
     const [exhibitionLocation, setExhibitionLocation] = useState('');
-    const [district, setDistrict] = useState();
+    const [district, setDistrict] = useState([]);
 
     const [modalIsVisible, setModalIsVisible] = useState(false); // 구 input칸 클릭 시 나오는 modal (true / false)
     
@@ -108,6 +108,18 @@ function SearchOptions({pressed}) {
         setFind(!find);
     }
 
+    function handleRefresh() { // 모든 옵션 초기화 함수
+        setExhibitionTitle('');
+        setExhibitionLocation('');
+        setDistrict([]);
+        setStartDate(new Date());
+        setEndDate(() => { // 종료일 (시작일 + 30일)
+            const today = new Date();
+            today.setDate(today.getDate() + 30);
+            return today;
+        });
+    }
+
     const resultExhibitions = exhibitionsCtx.exhibitions;
 
     const renderItem = ({ item }) => (
@@ -173,6 +185,8 @@ function SearchOptions({pressed}) {
                     pressed={modalIsVisible} 
                     onCancel={closeModal}
                     onSelectedDistrictList={handleSetDistrict}
+                    district={district}
+                    setDistrict={setDistrict}
                 />
                 <View style={styles.subTitle2}>
                     <Pressable onPress={showStartDateTimePicker}>
@@ -202,8 +216,8 @@ function SearchOptions({pressed}) {
                     <Pressable style={styles.searchUi} onPress={findExhibition}>
                         <Text style={styles.searchFont}>검색하기</Text>
                     </Pressable>
-                    <Pressable>
-                        <MaterialIcons name="search" size={48} color="#A3A098" />
+                    <Pressable onPress={handleRefresh}>
+                        <FontAwesome name="refresh" size={36} color="black" style={styles.refresher} />
                     </Pressable>
                 </View>
             </View>
@@ -281,11 +295,9 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         color: 'white'
     },    
-    testStyle1: {
-        backgroundColor: 'black'
-    },
-    textStyle2: {
-        backgroundColor: 'red'
+    refresher: { // 새로고침
+        color: '#A3A098',
+        marginLeft: 60
     },
     defaultScreen: { // 검색 옵션 있을 때
         flex: 1,

@@ -2,7 +2,6 @@ import { StatusBar } from 'expo-status-bar'; // 맨 위에 시간, 배터리...
 import { SafeAreaView, StyleSheet } from 'react-native'; // 아이폰 노치 (SafeAreaView)
 import { NavigationContainer } from '@react-navigation/native'; // navigator 쓰기 위해서 필요
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; // bottom navigator
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; // stack navigator
 
 import { MaterialIcons } from '@expo/vector-icons'; // expo icons 이미지
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // expo icons 이미지
@@ -12,11 +11,9 @@ import MainScreen from './screens/MainScreen';
 import MapScreen from './screens/MapScreen';
 import CalendarScreen from './screens/CalendarScreen';
 import FavoriteScreen from './screens/FavoriteScreen';
-import InfromationScreen from './screens/InformationScreen';
 import ExhibitionsContextProvider from './store/exhibitions-context';
 
 const BottomNavigator = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
 
 function ExhibitionsOverview(pressed) { // 네비게이터 설정 함수
   return (
@@ -67,13 +64,7 @@ export default function App() {
       <SafeAreaView style={styles.rootScreen}>
         <ExhibitionsContextProvider>
           <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen name="ExhibitionsOverview" component={ExhibitionsOverview} options={{ headerShown: false}}/>
-              <Stack.Screen name="InformationScreen" component={InfromationScreen} options={{
-                headerShown: false,
-                headerBackTitleVisible: false,
-              }} />
-            </Stack.Navigator>
+            <ExhibitionsOverview />
           </NavigationContainer>
         </ExhibitionsContextProvider>
       </SafeAreaView>

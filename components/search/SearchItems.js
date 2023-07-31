@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { deleteLikedExhibition, saveLikedExhibition } from "../../DB/localStorage";
-// import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../../DB/firebase"; // DB 관련 기능
 
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
+import InfromationScreen from "../../screens/InformationScreen";
+import { Modal } from "react-native";
 
 // function truncateText(text, maxLength) { // 전시회 검색 결과 텍스트들 글자 길이 설정
 //     if (text.length > maxLength) {
@@ -23,21 +24,7 @@ function SearchItems({result}) {
 
     const [onGoing, setOnGoing] = useState('전시중');
     const [isLike, setIsLike] = useState(false); // 좋아요 상태
-
-    // function likeHandler() {
-    //     setIsLike(!isLike);
-    //     if (!isLike) {
-    //         postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
-    //         console.log(isLike);
-    //     } else {
-    //         findAndDeleteInUserDB(title);
-    //         console.log(isLike);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     findIsLike(title, setIsLike);
-    // }, []);
+    const [showInformation, setShowInformation] = useState(false);
 
     function likeHandler() {
         setIsLike(!isLike);
@@ -48,44 +35,62 @@ function SearchItems({result}) {
         }
     }
 
-    function exhivitionPressHandler() {
-        navigation.navigate('InformationScreen', {
-            title: title,
-            thumbnail: thumbnail,
-            exhibition: exhibition,
-            startDate: startDate,
-            endDate: endDate,
-            time: time,
-            restDay: restDay,
-            fee: fee,
-            callNumber: callNumber,
-            siteAddress: siteAddress,
-            mainAuthor: mainAuthor,
-            otherAuthors: otherAuthors,
-            imageInformations: imageInformations,
-            textInformation: textInformation,
-        });
+    const datas = {
+        title: title,
+        thumbnail: thumbnail,
+        exhibition: exhibition,
+        startDate: startDate,
+        endDate: endDate,
+        time: time,
+        restDay: restDay,
+        fee: fee,
+        callNumber: callNumber,
+        siteAddress: siteAddress,
+        mainAuthor: mainAuthor,
+        otherAuthors: otherAuthors,
+        imageInformations: imageInformations,
+        textInformation: textInformation,
+        isLike: isLike,
+        setIsLike: setIsLike,
+        likeHandler: likeHandler
     }
 
+    function openInformation() {
+        setShowInformation(true);
+    }
+
+    function closeInformation() {
+        setShowInformation(false);
+    }
+
+
+
     return (
-        <View style={styles.root}>
-            <Pressable onPress={exhivitionPressHandler} style={({pressed}) => pressed && styles.pressed}>
-                <View style={styles.screen}>
-                    <View style={styles.listItems}>
-                        <Image style={styles.logoImage} source={{uri: thumbnail}} />
-                        <View style={styles.lists}>
-                            <Text style={styles.text}>{title}</Text>
-                            <Text style={styles.text}>{exhibition}</Text>
-                            <Text style={styles.text}>{startDate} ~ {endDate}</Text>
-                            <View style={styles.heartBox}>
-                                <Text style={styles.onGoing}>{onGoing}</Text>
-                                <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={24} color="red" onPress={likeHandler} />
+        <>
+            <View style={styles.root}>
+                <Pressable onPress={openInformation} style={({pressed}) => pressed && styles.pressed}>
+                    <View style={styles.screen}>
+                        <View style={styles.listItems}>
+                            <Image style={styles.logoImage} source={{uri: thumbnail}} />
+                            <View style={styles.lists}>
+                                <Text style={styles.text}>{title}</Text>
+                                <Text style={styles.text}>{exhibition}</Text>
+                                <Text style={styles.text}>{startDate} ~ {endDate}</Text>
+                                <View style={styles.heartBox}>
+                                    <Text style={styles.onGoing}>{onGoing}</Text>
+                                    <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={24} color="red" onPress={likeHandler} />
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
-            </Pressable>
-        </View>
+                </Pressable>
+                {showInformation && <Modal>
+                        <InfromationScreen datas={datas} onCancel={closeInformation} />
+                    </Modal>
+                }
+            </View>
+            
+        </>
     );
 }
 

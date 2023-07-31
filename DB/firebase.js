@@ -1,19 +1,19 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DATABASE_URL = 'https://artcalendar-test-default-rtdb.firebaseio.com';
 
-async function getUserId() { // userId 생성 및 get
-    let userId = await AsyncStorage.getItem('userId');
+// async function getUserId() { // userId 생성 및 get
+//     let userId = await AsyncStorage.getItem('userId');
   
-    if (!userId) {
-      userId = uuidv4();
-      await AsyncStorage.setItem('userId', userId);
-    }
+//     if (!userId) {
+//       userId = uuidv4();
+//       await AsyncStorage.setItem('userId', userId);
+//     }
   
-    return userId;
-}
+//     return userId;
+// }
 
 export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, district, startDate, endDate) { // 데이터 출력하는 함수
     const response = await axios.get(DATABASE_URL + '/exhibitions.json');
@@ -32,7 +32,7 @@ export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, dist
         // const exhibitionEndDate = new Date(endDate2.replace(/\./g, '-'));
 
         if ( // 검색 코드
-            (!district || district.some(d => exhibitionDistrict.toLowerCase().includes(d.toLowerCase())))
+            (district.length === 0 || district.includes(exhibitionDistrict.toLowerCase()))
             && (!exhibitionTitle || exhibition.title.toLowerCase().includes(exhibitionTitle.toLowerCase()))
             && (!exhibitionLocation || exhibition.exhibition.toLowerCase().includes(exhibitionLocation.toLowerCase()))
         ) {
