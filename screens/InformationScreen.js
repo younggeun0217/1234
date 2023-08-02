@@ -1,12 +1,12 @@
 // 전시회 상세정보 screen
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert, Pressable } from "react-native";
 import { useState} from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Share } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import { Entypo } from '@expo/vector-icons'; // 공유 이미지 import
-import { Pressable } from "react-native";
 
 function InfromationScreen({datas, onCancel}) {
     const navigation = useNavigation();
@@ -60,6 +60,10 @@ function InfromationScreen({datas, onCancel}) {
         );
     }
 
+    async function shareKakaoLink() {
+
+    }
+
     return (
         <>
             <View style={styles.container}>
@@ -110,7 +114,9 @@ function InfromationScreen({datas, onCancel}) {
             </View>
             <View style={styles.footer}>
                 <View style={styles.footerIconBox}>
-                    <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
+                    <Pressable onPress={async () => await Share.share({ message: `\n제목: ${title}`, title: siteAddress, url: siteAddress})}>
+                        <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
+                    </Pressable>
                     <AntDesign 
                         style={styles.footerIcons} 
                         name={likeState ? "heart" : "hearto"}

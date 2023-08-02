@@ -23,6 +23,10 @@ const MapScreen = () => {
     );
   }
 
+  function handleSelectedDistrictList(districtList) {
+    setSelectedDistrictList(districtList);
+  }
+
   function openModal() { // Modal 열기
     setModalVisible(true);
   }
@@ -53,6 +57,8 @@ const MapScreen = () => {
         pressed={modalVisible}
         onCancel={closeModal}
         onSelectedDistrictList={handleSelectedDistrictList}
+        district={selectedDistrictList}
+        setDistrict={setSelectedDistrictList}
       />
       <MapView
         style={styles.map}
