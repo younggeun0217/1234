@@ -60,10 +60,6 @@ function InfromationScreen({datas, onCancel}) {
         );
     }
 
-    async function shareKakaoLink() {
-
-    }
-
     return (
         <>
             <View style={styles.container}>

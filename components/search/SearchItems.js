@@ -1,8 +1,7 @@
 // 검색 결과 이미지, title, 장소, 날짜, 전시중
 import { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { deleteLikedExhibition, saveLikedExhibition } from "../../DB/localStorage";
+import { deleteLikedExhibition, saveLikedExhibition, getAllLikedExhibitions } from "../../DB/localStorage";
 
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import InfromationScreen from "../../screens/InformationScreen";
@@ -20,12 +19,26 @@ function SearchItems({result}) {
     // const truncatedTitle = truncateText(title, 18); // 전시회 제목 글자 수 제한
     // const truncatedLocation = truncateText(location, 18); // 전시회 장소 글자 수 제한
     
-    const navigation = useNavigation();
     const today = new Date();
 
     const [onGoing, setOnGoing] = useState('전시중');
     const [isLike, setIsLike] = useState(false); // 좋아요 상태
     const [showInformation, setShowInformation] = useState(false);
+
+
+    async function fetchIsLikeValue() { // 좋아요 상태 체크
+        try {
+            const likedExhibitions = await getAllLikedExhibitions();
+            const isLiked = likedExhibitions.some((exhibition) => exhibition.title === title);
+            setIsLike(isLiked);
+        }   catch (error) {
+            console.log("Error while fetching 'isLike' value:", error);
+        }
+      }
+    
+    useEffect(() => { // 렌더링 될 때 마다 
+        fetchIsLikeValue(); // 좋아요 상태 체크
+    }, []);
 
 
     function parseDate(dateString) { // 2023.08.01 을 new Date 형식으로 파싱

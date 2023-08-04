@@ -3,7 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // 로컬 스토리지에 좋아요 누른거 저장하는 함수
 export const saveLikedExhibition = async (title, thumbnail, exhibition, startDate, endDate, isLike='true') => {
     try {
+        const key = title;
         const likedExhibitionData = {
+            key,
             title,
             thumbnail,
             exhibition,
@@ -11,10 +13,9 @@ export const saveLikedExhibition = async (title, thumbnail, exhibition, startDat
             endDate,
             isLike
         };
-
         const dataToSave = JSON.stringify(likedExhibitionData);
 
-        await AsyncStorage.setItem('likedExhibition', dataToSave);
+        await AsyncStorage.setItem(key, dataToSave);
         console.log(`AsyncStorage에 ${title} 저장됨`);
     } catch(error) {
         console.log('AsyncStorage에 저장 실패:', error);
@@ -24,17 +25,11 @@ export const saveLikedExhibition = async (title, thumbnail, exhibition, startDat
 // 로컬 스토리지에 저장했던 좋아요 전시회 삭제하는 함수
 export const deleteLikedExhibition = async (title) => {
     try {
-        const data = await AsyncStorage.getItem('likedExhibition');
+        const data = await AsyncStorage.getItem(title);
         
         if(data) {
-            const likedExhibitionData = JSON.parse(data);
-
-            if(likedExhibitionData.title === title) {
-                await AsyncStorage.removeItem('likedExhibition');
-                console.log(`AsyncStorage의 ${title} 데이터 삭제 성공`);
-            } else {
-                console.log('입력받은 title로 데이터를 찾지 못함');
-            }
+            await AsyncStorage.removeItem(title);
+            console.log(`AsyncStorage의 ${title} 데이터 삭제 성공`);
         } else {
             console.log('AsyncStorage에 데이터가 없음');
         }
@@ -44,22 +39,27 @@ export const deleteLikedExhibition = async (title) => {
 };
 
 // 로컬 스토리지에서 좋아요를 누른 전시회를 찾는 함수
-export const findLikedExhibition = async (title, callback) => {
-    try{
-        const data = await AsyncStorage.getItem('likedExhibition');
+export const getAllLikedExhibitions = async () => {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const likedExhibitionDataArray = [];
 
-        if(data) {
+      for (const key of keys) {
+        try {
+          const data = await AsyncStorage.getItem(key);
+          if (data) {
             const likedExhibitionData = JSON.parse(data);
-
-            if (likedExhibitionData.title === title) {
-                callback(likedExhibitionData.isLike); 
-            } else {
-                console.log('입력받은 title로 데이터를 찾지 못함');
-            }
-        } else {
-            console.log('AsyncStorage에 데이터가 없음');
+            likedExhibitionDataArray.push(likedExhibitionData);
+          }
+        } catch (error) {
+          console.log(`key를 이용하여 찾지 못하였습니다. ${key}:`, error);
         }
-    } catch(error) {
-        console.log('찾기 에러:', error);
+      }
+  
+      return likedExhibitionDataArray;
+    } catch (error) {
+      console.log('fetching 에러가 발생하였습니다. :', error);
+      return [];
     }
-};
+  };
+
