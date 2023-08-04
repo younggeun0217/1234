@@ -53,6 +53,8 @@ export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, dist
                 otherAuthors: exhibition.otherAuthors,
                 imageInformations: exhibition.imageInformations,
                 textInformation: exhibition.textInformation,
+                latitude: exhibition.latitude,
+                longitude: exhibition.longitude
             };
             exhibitions.push(exhibitionObject);
         }
