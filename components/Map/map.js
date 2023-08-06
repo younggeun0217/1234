@@ -175,7 +175,7 @@ function handleSetDistrict(districts) { // district 상태를 handling하는 함
             </View>
             <View style={styles.exhibitionItemText}>
               <Text>{exhibition.title.length > 20 ? exhibition.title.substring(0, 20) + '...' : exhibition.title}</Text>
-              <Text style={styles.calloutSubtitle}>{exhibition.title.length > 20 ? exhibition.location.substring(0, 20) + '...' : marker.location}</Text>
+              <Text style={styles.calloutSubtitle}>{exhibition.title.length > 20 ? exhibition.location.substring(0, 20) + '...' : exhibition.location}</Text>
               <Text style={styles.calloutSubtitle}>{exhibition.startDate}{'-'}{exhibition.endDate}</Text>
             </View>
           </View>
