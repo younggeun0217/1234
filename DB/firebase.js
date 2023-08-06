@@ -29,7 +29,7 @@ export async function fetchExhibitions(exhibitionTitle = '', exhibitionLocation 
             (district.length === 0 || district.includes(exhibitionDistrict.toLowerCase()))
             && (!exhibitionTitle || exhibition.title.toLowerCase().includes(exhibitionTitle.toLowerCase()))
             && (!exhibitionLocation || exhibition.exhibition.toLowerCase().includes(exhibitionLocation.toLowerCase()))
-            // && (startDate >= exhibitionStartDate && endDate <= exhibitionEndDate) // 보류
+            && (startDate <= exhibitionEndDate && endDate >= exhibitionStartDate)
         ) {
             const exhibitionObject = {
                 id: key,
