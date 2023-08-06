@@ -15,7 +15,7 @@ const DATABASE_URL = 'https://artcalendar-test-default-rtdb.firebaseio.com';
 //     return userId;
 // }
 
-export async function fetchExhibitions(exhibitionTitle, exhibitionLocation, district, startDate, endDate) { // 데이터 출력하는 함수
+export async function fetchExhibitions(exhibitionTitle = '', exhibitionLocation = '', district = '', startDate, endDate) { // 데이터 출력하는 함수
     const response = await axios.get(DATABASE_URL + '/exhibitions.json');
     const exhibitions = [];
 
