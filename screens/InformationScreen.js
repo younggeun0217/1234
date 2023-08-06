@@ -1,31 +1,34 @@
 // 전시회 상세정보 screen
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert } from "react-native";
-import { useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Linking, Alert, Pressable } from "react-native";
+import { useState} from "react";
 import { useNavigation } from "@react-navigation/native";
-
-import { findIsLike, postDataInUserDB, findAndDeleteInUserDB } from "../DB/firebase"; // DB 관련 기능
+import { Share } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons'; // expo icons 이미지
 import { AntDesign } from '@expo/vector-icons'; // 하트 이미지 import
 import { Entypo } from '@expo/vector-icons'; // 공유 이미지 import
 
-function InfromationScreen({route}) {
+function InfromationScreen({datas, onCancel}) {
     const navigation = useNavigation();
 
-    const title = route.params?.title; // 제목
-    const thumbnail = route.params?.thumbnail; // 섬네일 링크
-    const exhibition = route.params?.exhibition; // 전시회관
-    const startDate = route.params?.startDate; // 시작일
-    const endDate = route.params?.endDate; // 종료일
-    const time = route.params?.time; // 관람 시간
-    const restDay = route.params?.restDay; // 휴관일
-    const fee = route.params?.fee; // 관람료
-    const callNumber = route.params?.callNumber; // 관련 전화번호
-    const siteAddress = route.params?.siteAddress; // 관련 사이트 주소
-    const mainAuthor = route.params?.mainAuthor; // 작가명
-    const otherAuthors = route.params?.otherAuthors; // 그외 작가명 (여러명인 경우)
-    const imageInformations = route.params?.imageInformations; // 전시회 상세 정보 이미지들 링크
-    const textInformation = route.params?.textInformation; // 전시회 상세 정보 텍스트 
+    const title = datas.title; // 제목
+    const thumbnail = datas.thumbnail; // 섬네일 링크
+    const exhibition = datas.exhibition; // 전시회관
+    const startDate = datas.startDate; // 시작일
+    const endDate = datas.endDate; // 종료일
+    const time = datas.time; // 관람 시간
+    const restDay = datas.restDay; // 휴관일
+    const fee = datas.fee; // 관람료
+    const callNumber = datas.callNumber; // 관련 전화번호
+    const siteAddress = datas.siteAddress; // 관련 사이트 주소
+    const mainAuthor = datas.mainAuthor; // 작가명
+    const otherAuthors = datas.otherAuthors; // 그외 작가명 (여러명인 경우)
+    const imageInformations = datas.imageInformations; // 전시회 상세 정보 이미지들 링크
+    const textInformation = datas.textInformation; // 전시회 상세 정보 텍스트 
+    const setIsLike = datas.setIsLike;
+    const likeHandler = datas.likeHandler;
+
+    const [likeState, setLikeState] = useState(datas.isLike);
 
     let Authors = mainAuthor; // 작가명 전부 합친거
 
@@ -33,21 +36,11 @@ function InfromationScreen({route}) {
     Authors += ',' + otherAuthors;
     }
 
-    const [isLike, setIsLike] = useState(false); // 좋아요 상태
-
-    function likeHandler() {
-        setIsLike(!isLike);
-        if (!isLike) {
-            postDataInUserDB(title, thumbnail, exhibition, startDate, endDate);
-        } else {
-            findAndDeleteInUserDB(title);
-        }
-    };
-
-    useEffect(() => {
-        findIsLike(title, setIsLike);
-    }, []);
-
+    function setLikeHandler() {
+        setIsLike(!datas.isLike);
+        likeHandler();
+        setLikeState(!likeState);
+    }
 
     function linkHompepageHandler() {
         if (siteAddress !== null) {
@@ -69,24 +62,28 @@ function InfromationScreen({route}) {
 
     return (
         <>
-            <ScrollView>
-                <View style={styles.rootContainer}>
-                    <View style={styles.headerBox}>
+            <View style={styles.container}>
+                <View style={styles.headerBox}>
+                    <Pressable onPress={onCancel}>
                         <Ionicons
                             name="arrow-back"
                             size={36}
                             color="black"
                             style={{ marginLeft: 10 }}
-                            onPress={() => navigation.goBack()} 
                         />
-                        <Ionicons
-                            name="home-outline"
-                            size={36}
-                            color="black"
-                            style={{ marginRight: 10 }}
-                            onPress={() => navigation.navigate('ExhibitionsOverview')}
-                        />
-                    </View>
+                    </Pressable>
+                    <Ionicons
+                        name="home-outline"
+                        size={36}
+                        color="black"
+                        style={{ marginRight: 10 }}
+                        onPress={() => {
+                            onCancel();
+                            navigation.navigate('조회');
+                        }}
+                    />
+                </View>
+                <ScrollView style={styles.scrollContainer}>
                     <Text style={styles.headerText}>{title}</Text>
                     <Image style={styles.thumbnail} resizeMode="contain" source={{ uri: thumbnail }} />
                     <View style={styles.informationContainer}>
@@ -109,12 +106,19 @@ function InfromationScreen({route}) {
                         ))}
                         <Text style={styles.informationText}>{textInformation}</Text>
                     </View>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </View>
             <View style={styles.footer}>
                 <View style={styles.footerIconBox}>
-                    <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
-                    <AntDesign style={styles.footerIcons} name={isLike ? "heart" : "hearto"} size={36} color="red" onPress={likeHandler} />
+                    <Pressable onPress={async () => await Share.share({ message: `\n제목: ${title}`, title: siteAddress, url: siteAddress})}>
+                        <Entypo style={styles.footerIcons} name="share" size={36} color="black" />
+                    </Pressable>
+                    <AntDesign 
+                        style={styles.footerIcons} 
+                        name={likeState ? "heart" : "hearto"}
+                        size={36} 
+                        color="red" 
+                        onPress={setLikeHandler} />
                 </View>
                 <View style={styles.footerTextBox}>
                     <TouchableOpacity onPress={linkHompepageHandler}>
@@ -132,13 +136,15 @@ const devideWidth = Dimensions.get('window').width; // 사용 기기 width
 const deviceHeight = Dimensions.get('window').height; // 사용 기기 height
 
 const styles = StyleSheet.create({
-    rootContainer: {
+    container: {
         flex: 1,
-        marginTop: '10%'
     },
     headerBox: {
         flexDirection: "row",
         justifyContent: "space-between"
+    },
+    scrollContainer: {
+        flex: 1
     },
     headerText: {
         fontSize: 25,

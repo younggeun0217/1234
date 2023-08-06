@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { Modal, View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 
 import {DISTRICT} from '../../data/seoulDistrict'; // 서울 지역구 list 가져옮
+import { FontAwesome } from '@expo/vector-icons'; // 새로고침 이미지
 
-function DistrictModal({pressed, onCancel, onSelectedDistrictList}) { 
-    const [selectedDistrictList, setSelectedDistrictList] = useState([]); // 선택된 지역구들
+function DistrictModal({pressed, onCancel, onSelectedDistrictList, district, setDistrict}) { 
+    const [selectedDistrictList, setSelectedDistrictList] = useState(district); // 선택된 지역구들
 
     function selectDistrict({district}) { // id와 name을 객체로 받아옮 + 지역구 선택 안하면 추가, 이미 선택 했으면 없애는 함수
         setSelectedDistrictList((prevSelectedDistrictList) => {
@@ -25,6 +26,11 @@ function DistrictModal({pressed, onCancel, onSelectedDistrictList}) {
                 return sortedDistrictList; // 정렬된 list return
             }
         });
+    }
+
+    function handleRefresh() { // 자치구 선택 초기화 함수
+        setSelectedDistrictList([]);
+        setDistrict([]);
     }
 
     useEffect(() => {
@@ -50,11 +56,16 @@ function DistrictModal({pressed, onCancel, onSelectedDistrictList}) {
                         </View>
                     </ScrollView>
                     <View style={styles.footer}>
-                        <Pressable onPress={onCancel}>
-                            <View style={styles.footerBox}>
-                                <Text style={styles.footerText}>적용하기</Text>
-                            </View>
-                        </Pressable>
+                        <View style={styles.footerContainer}>
+                            <Pressable onPress={onCancel}>
+                                <View style={styles.footerTextBox}>
+                                    <Text style={styles.footerText}>적용하기</Text>
+                                </View>
+                            </Pressable>
+                            <Pressable onPress={handleRefresh}>
+                                <FontAwesome name="refresh" size={36} color="black" style={styles.footerRefresher} />
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -103,15 +114,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 120
     },
-    footerBox: { // 적용하기 box
+    footerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    footerTextBox: { // 적용하기 Textbox
+        width: '130%',
         backgroundColor: '#A3A098',
         borderColor: '#A3A098',
         borderWidth: 1,
         borderRadius: 16,
+        justifyContent: 'center'
     },
     footerText: { // 적용하기 text
         fontSize: 24,
         color: 'white',
         textAlign: 'center',
+    },
+    footerRefresher: { // 새로고침
+        color: '#A3A098',
+        marginLeft: 60
     }
 });
