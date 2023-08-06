@@ -8,8 +8,10 @@ function MemoListModal({ selectedDate, onClose }) {
   const [memoText, setMemoText] = useState('');
   const [memoModalVisible, setMemoModalVisible] = useState(false);
   const [memoListVisible, setMemoListVisible] = useState(true);
-  const [savedMemo, setSavedMemo] = useState(''); 
+  const [savedMemos, setSavedMemos] = useState({}); 
   const [selectedScheduleTitle, setSelectedScheduleTitle] = useState('');
+  const [currentScheduleId, setCurrentScheduleId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); 
 
   const formattedDate = selectedDate.split('-').join('.');
   console.log(formattedDate); 
@@ -36,40 +38,48 @@ function MemoListModal({ selectedDate, onClose }) {
     setMemoText(text);
   };
 
-  const handleEditMemo = (schedule) => {
+  const handleEdit = (schedule) => {
     console.log('선택된 일정 제목:', schedule.title);
+    setIsEditing(true);
+    setCurrentScheduleId(schedule.id);  // 이 부분을 추가하세요
     setSelectedScheduleTitle(schedule.title);
     setSelectedMemo([]);
-    setMemoText('');
-
+    setMemoText(savedMemos[schedule.id] || '');
     setMemoModalVisible(true); 
-  };
-  const handleSaveMemo = () => {
-    setSavedMemo(memoText); 
-    toggleMemoModal(); 
+};
+  const handleSaveMemo = (id) => {
+    setSavedMemos(prevMemos => ({
+        ...prevMemos,
+        [id]: memoText
+    }));
+    console.log(savedMemos);
+    toggleMemoModal();
+};
+
+function memoList() {
+  if (!memoListVisible) return null;
+
+  const getTrimmedMemo = (memo) => {
+      const lines = memo.split('\n');
+      if (lines.length <= 3) return memo;
+      return lines.slice(0, 3).join('\n') + '...';
   };
 
-  function memoList() {
-    if (!memoListVisible) return null;
-    return schedule.map((item) => (
+  return schedule.map((item) => (
       <View key={item.id} style={styles.memoContainer}>
-        <View style={styles.memoHeader}>
-          <TouchableOpacity onPress={() => handleEditMemo(item)}>
-            <Text style={styles.memoText}>{item.title}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleMemoPress(item.id)}>
-            <AntDesign
-              name={selectedMemo.includes(item.id) ? 'down' : 'right'}
-              size={16}
-              color="black"
-              style={{ paddingTop: 5, paddingLeft: 5, width: '100%' }}
-            />
-          </TouchableOpacity>
-        </View>
-        {selectedMemo.includes(item.id) && <Text style={styles.memoText}>메모 : {savedMemo}</Text>}
+          <View style={styles.memoHeader}>
+              <TouchableOpacity onPress={() => handleEdit(item)}>
+                  <Text style={styles.memoText}>{item.title}</Text>
+              </TouchableOpacity>
+          </View>
+          {savedMemos[item.id] && 
+              <Text style={styles.memoText}>
+                  메모 : {getTrimmedMemo(savedMemos[item.id])}
+              </Text>
+          }
       </View>
-    ));
-  }
+  ));
+}
 
  
  
@@ -95,8 +105,12 @@ function MemoListModal({ selectedDate, onClose }) {
             formattedDate={formattedDate}
             memoText={memoText}
             handleMemoTextChange={handleMemoTextChange}
-            onSave={handleSaveMemo}
+            onSave={() => handleSaveMemo(currentScheduleId)}
             selectedScheduleTitle={selectedScheduleTitle}
+            currentScheduleId={currentScheduleId}
+            isEditing={isEditing}
+            onDelete={() => handleDelete(currentScheduleId)}
+            handleEdit={handleEdit}
           />
         </View>
       </View>
