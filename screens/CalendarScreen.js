@@ -1,52 +1,59 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { Feather } from '@expo/vector-icons'; // 화살표 이미지
-import MemoListModal from '../components/Calendar/MemoListModal';
-
+import React, { useState } from "react";
+import { useFocusEffect } from '@react-navigation/native';
+import { View, StyleSheet, Text } from "react-native";
+import { Calendar } from "react-native-calendars";
+import { Feather } from "@expo/vector-icons"; // 화살표 이미지
+import MemoListModal from "../components/Calendar/MemoListModal";
+import { getAllLikedExhibitions } from "../DB/localStorage";
 
 function CalendarScreen() {
-
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState("");
+  const [exhibitionData, setExhibitionData] = useState([]); // 로컬 스토리지 데이터들
 
-  const exhibitionList = [
-    {
-      id: 1,
-      title: "참조점",
-      color: "#A0C896",
-    },
-    {
-      id: 2,
-      title: "강우솔, 임아진:(불)응하는 몸",
-      color: "#F1C7C8",
-    },
-    {
-      id: 3,
-      title: "Param",
-      color: "#DDDBE8",
-    },
-    {
-      id: 4,
-      title: "피카소와 20세기 거장들",
-      color: "#F5E7CE",
-    },
-  ];
+  useFocusEffect( // 화면 렌더링하기 위해 사용
+    React.useCallback(() => {
+      const fetchExhibitionData = async () => {
+        const likedExhibitions = await getAllLikedExhibitions();
+        setExhibitionData(likedExhibitions);
+      };
+  
+      fetchExhibitionData();
+    }, [])
+  );
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
     setIsModalVisible(true);
   };
 
+  const formatDate = (date) => {
+    const parts = date.split('.');
+    return `${parts[0]}-${parts[1]}-${parts[2]}`;
+  };
+
+  const exhibitionDataByDate = exhibitionData.filter((item) => {
+    const formattedStartDate = formatDate(item.startDate);
+    const formattedEndDate = formatDate(item.endDate);
+    const selectedFormattedDate = formatDate(selectedDate);
+
+    return (
+      selectedFormattedDate >= formattedStartDate &&
+      selectedFormattedDate <= formattedEndDate
+    );
+  });
+
   const getMarked = (schedules, highlightedDate) => {
     let marked = { ...highlightedDate };
-
+  
     schedules.forEach((schedule) => {
       const { startingDay, duration, color } = schedule;
+      const startingDate = new Date(startingDay.replace(/\./g, "-")); // Convert format
+  
       for (let i = 0; i < duration; i++) {
-        let day = new Date(startingDay);
+        let day = new Date(startingDate);
         day.setDate(day.getDate() + i);
-        let formattedDay = day.toISOString().split('T')[0];
+        let formattedDay = day.toISOString().split("T")[0];
         let periods = [
           {
             startingDay: i === 0,
@@ -65,71 +72,70 @@ function CalendarScreen() {
         }
       }
     });
-
+  
     return marked;
   };
 
   // 강조 07월 04일
   // 여기에 하드코딩 된 객체 교체
   const highlightedDate = {
-    "2023-07-12": { selected: true, selectedColor: "#B8B5AD" },
-    "2023-07-18": { selected: true, selectedColor: "#B8B5AD" },
+    "2023-08-12": { selected: true, selectedColor: "#B8B5AD" },
+    "2023-08-18": { selected: true, selectedColor: "#B8B5AD" },
   };
 
   // 여기에 하드코딩 된 객체 교체
   const markedDates = getMarked(
-    [
-      { startingDay: "2023-07-02", duration: 12, color: "#A0C896",},
-      { startingDay: "2023-07-07", duration: 10, color: "#F1C7C8",},
-      { startingDay: "2023-07-10", duration: 20, color: "#DDDBE8" },
-      { startingDay: "2023-07-20", duration: 30, color: "#F5E7CE" },
-    ],
+    exhibitionData.map((item) => ({
+      startingDay: item.startDate, // Change this according to your data structure
+      duration: item.duration, // You need to implement this function
+      color: item.color,
+    })),
     highlightedDate
   );
 
   return (
-      <View style={styles.root}>
-        <View>
-          <Text style={styles.pageTitle}>My Exhibition</Text>
-        </View>
-        <View style={styles.table}>
-          {exhibitionList.map((data) => (
-            <View key={data.id} style={styles.content}>
-              <View style={styles.titleContainer}>
-                <Text style={styles.contentTitle}>{data.title}</Text>
-              </View>
-              <View
-                style={[styles.contentColor, { backgroundColor: data.color }]}
-              ></View>
-            </View>
-          ))}
-        </View>
+    <View style={styles.root}>
       <View>
-      <Calendar
-            markingType="multi-period"
-            onDayPress={handleDayPress}
-            markedDates={markedDates}
-            theme={{
-              "stylesheet.marking": {
-                // 기간(bar)
-                period: {
-                  height: 13, // bar 크기 조정
-                },
+        <Text style={styles.pageTitle}>My Exhibition</Text>
+      </View>
+      <View style={styles.table}>
+        {exhibitionData.map((data) => (
+          <View key={data.key} style={styles.content}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.contentTitle}>{data.title}</Text>
+            </View>
+            <View
+              style={[styles.contentColor, { backgroundColor: data.color }]}
+            ></View>
+          </View>
+        ))}
+      </View>
+      <View>
+        <Calendar
+          markingType="multi-period"
+          onDayPress={handleDayPress}
+          markedDates={markedDates}
+          theme={{
+            "stylesheet.marking": {
+              // 기간(bar)
+              period: {
+                height: 13, // bar 크기 조정
               },
-            }}
-            renderArrow={(direction) => {
-              if (direction == "left")
-                return (
-                  <Feather name="arrow-left" size={30} color="skyblue" />
-                );
-              if (direction == "right")
-                return (
-                  <Feather name="arrow-right" size={30} color="skyblue" />
-                );
-            }}
-      /> 
+            },
+          }}
+          renderArrow={(direction) => {
+            if (direction == "left")
+              return <Feather name="arrow-left" size={30} color="skyblue" />;
+            if (direction == "right")
+              return <Feather name="arrow-right" size={30} color="skyblue" />;
+          }}
+        />
         {isModalVisible && (
-          <MemoListModal selectedDate={selectedDate} onClose={() => setIsModalVisible(false)} />
+          <MemoListModal
+            selectedDate={selectedDate}
+            onClose={() => setIsModalVisible(false)}
+            exhibitionDataByDate={exhibitionDataByDate}
+          />
         )}
       </View>
     </View>
@@ -141,8 +147,8 @@ export default CalendarScreen;
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    marginTop: '10%',
-    backgroundColor: 'white'
+    marginTop: "10%",
+    backgroundColor: "white",
   },
   pageTitle: {
     marginBottom: 10,
@@ -176,5 +182,5 @@ const styles = StyleSheet.create({
   contentColor: {
     flex: 1,
     height: 10,
-  },  
+  },
 });

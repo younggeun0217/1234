@@ -9,10 +9,27 @@ const generateRandomColor = () => {
   return color;
 };
 
+const calculateDurationInDays = (startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const timeDifference = end - start; // Difference in milliseconds
+  const daysDifference = timeDifference / (1000 * 60 * 60 * 24); // Convert to days
+  return daysDifference;
+};
+
+const formatDate = (date) => {
+  const parts = date.split('.');
+  return `${parts[0]}-${parts[1]}-${parts[2]}`;
+};
+
 // 로컬 스토리지에 좋아요 누른거 저장하는 함수
 export const saveLikedExhibition = async (title, thumbnail, exhibition, startDate, endDate, isLike='true') => {
     try {
         const key = title;
+        const formattedStartDate = formatDate(startDate);
+        const formattedEndDate = formatDate(endDate);
+        console.log(formattedStartDate);
+        const duration = calculateDurationInDays(formattedStartDate, formattedEndDate);
         const likedExhibitionData = {
             key,
             title,
@@ -21,8 +38,10 @@ export const saveLikedExhibition = async (title, thumbnail, exhibition, startDat
             startDate,
             endDate,
             isLike,
-            color: generateRandomColor()
+            color: generateRandomColor(),
+            duration: duration
         };
+        console.log(startDate);
         const dataToSave = JSON.stringify(likedExhibitionData);
 
         await AsyncStorage.setItem(key, dataToSave);
