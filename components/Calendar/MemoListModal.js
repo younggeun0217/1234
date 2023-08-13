@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from "react-native";
 import MemoModal from "./MemoModal";
-import { getAllLikedExhibitions } from "../../DB/localStorage";
+import { getMemoData } from "../../DB/localStorage";
 
 function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   const [selectedMemo, setSelectedMemo] = useState([]);
@@ -18,19 +18,24 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   const [savedMemos, setSavedMemos] = useState({});
   const [selectedScheduleTitle, setSelectedScheduleTitle] = useState("");
   const [currentScheduleId, setCurrentScheduleId] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [exhibitionData, setExhibitionData] = useState([]); // 좋아요 전시회들 데이터
-
-  useEffect(() => {
-    const fetchExhibitionData = async () => {
-      const likedExhibitions = await getAllLikedExhibitions();
-      setExhibitionData(likedExhibitions);
-    };
-
-    fetchExhibitionData();
-  }, []);
+  const [memoDataMap, setMemoDataMap] = useState({});
 
   const formattedDate = selectedDate.split("-").join(".");
+
+  useEffect(() => {
+    async function fetchMemoData() {
+      const memoData = {};
+      await Promise.all(
+        exhibitionDataByDate.map(async (item) => {
+          const memoText = await getMemoData(item.title, formattedDate);
+          memoData[item.id] = memoText;
+        })
+      );
+      setMemoDataMap(memoData);
+    }
+
+    fetchMemoData();
+  }, [selectedDate, exhibitionDataByDate]);
 
   const toggleMemoModal = () => {
     setMemoModalVisible(!memoModalVisible);
@@ -42,46 +47,35 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
 
   const handleEdit = (schedule) => {
     console.log("선택된 일정 제목:", schedule.title);
-    setIsEditing(true);
     setCurrentScheduleId(schedule.id); // 이 부분을 추가하세요
     setSelectedScheduleTitle(schedule.title);
-    setSelectedMemo([]);
     setMemoText(savedMemos[schedule.id] || "");
     setMemoModalVisible(true);
   };
-  const handleSaveMemo = (id) => {
-    setSavedMemos((prevMemos) => ({
-      ...prevMemos,
-      [id]: memoText,
-    }));
-    console.log(savedMemos);
-    toggleMemoModal();
+
+  const getTrimmedMemo = (memo) => {
+    const lines = memo.split("\n");
+    if (lines.length <= 3) return memo;
+    return lines.slice(0, 3).join("\n") + "...";
   };
 
   function memoList() {
     if (!memoListVisible) return null;
   
-    const getTrimmedMemo = (memo) => {
-      const lines = memo.split("\n");
-      if (lines.length <= 3) return memo;
-      return lines.slice(0, 3).join("\n") + "...";
-    }
-  
     return exhibitionDataByDate.map((item) => (
-      <View key={item.key} style={styles.memoContainer}>
+      <View key={item.id} style={styles.memoContainer}>
         <View style={styles.memoHeader}>
           <TouchableOpacity onPress={() => handleEdit(item)}>
             <Text style={styles.memoText}>{item.title}</Text>
           </TouchableOpacity>
         </View>
-        {savedMemos[item.key] && (
-          <Text style={styles.memoText}>
-            메모 : {getTrimmedMemo(savedMemos[item.key])}
-          </Text>
+        {memoDataMap[item.id] && (
+          <Text style={styles.memoText}>메모 : {memoDataMap[item.id]}</Text>
         )}
       </View>
     ));
   }
+  
 
   return (
     <Modal animationType="slide" transparent={true} visible={true}>
@@ -116,11 +110,8 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
             formattedDate={formattedDate}
             memoText={memoText}
             handleMemoTextChange={handleMemoTextChange}
-            onSave={() => handleSaveMemo(currentScheduleId)}
             selectedScheduleTitle={selectedScheduleTitle}
             currentScheduleId={currentScheduleId}
-            isEditing={isEditing}
-            onDelete={() => handleDelete(currentScheduleId)}
             handleEdit={handleEdit}
           />
         </View>

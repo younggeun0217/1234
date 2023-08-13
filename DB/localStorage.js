@@ -23,13 +23,11 @@ const formatDate = (date) => {
 };
 
 // 로컬 스토리지에 좋아요 누른거 저장하는 함수
-export const saveLikedExhibition = async ( title, thumbnail, exhibition, startDate, endDate, isLike = "true", memos = {}
-) => {
+export const saveLikedExhibition = async ( title, thumbnail, exhibition, startDate, endDate, isLike = "true", memos = {}) => {
   try {
     const key = title;
     const formattedStartDate = formatDate(startDate);
     const formattedEndDate = formatDate(endDate);
-    console.log(formattedStartDate);
     const duration = calculateDurationInDays(
       formattedStartDate,
       formattedEndDate
@@ -46,7 +44,6 @@ export const saveLikedExhibition = async ( title, thumbnail, exhibition, startDa
       duration: duration,
       ...memos,
     };
-    console.log(startDate);
     const dataToSave = JSON.stringify(likedExhibitionData);
 
     await AsyncStorage.setItem(key, dataToSave);
@@ -126,13 +123,12 @@ export const addMemoToExhibition = async (title, date, memoText) => {
 // date : 2023.08.05
 export const getMemoData = async (title, date) => {
   try {
-    console.log(date);
       const data = await AsyncStorage.getItem(title);
       if (data) {
           const likedExhibitionData = JSON.parse(data);
           const memoData = likedExhibitionData[date];
-
           if (memoData) {
+              console.log(memoData.memoText);
               return memoData.memoText;
           } else {
               console.log(`${title}에 있는 ${date} 메모를 찾지 못하였습니다.`);

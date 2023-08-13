@@ -1,7 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, TextInput } from 'react-native';
+import { addMemoToExhibition } from '../../DB/localStorage';
 
-function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText, handleMemoTextChange, onSave,selectedScheduleTitle,onDelete,isEditing,handleEdit }) {
+function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText, handleMemoTextChange, selectedScheduleTitle, handleEdit }) {
+  
+  const handleSaveMemo = async () => {
+    try {
+      await addMemoToExhibition(selectedScheduleTitle, formattedDate, memoText);
+  
+      toggleMemoModal();
+    } catch (error) {
+      console.log("Error saving memo:", error);
+    }
+  };
+  
   return (
     <Modal animationType="fade" transparent={true} visible={memoModalVisible}>
       <View style={styles.memoModalContainer}>
@@ -14,8 +26,6 @@ function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText,
             </TouchableOpacity>
           </View>
           <Text style={{ fontSize: 20, marginBottom: 20 }}>{selectedScheduleTitle}</Text>
-          {isEditing ? (
-        <>
           <Text style={{fontSize:16}}>메모</Text>
           <TextInput
             style={styles.memoInput}
@@ -24,21 +34,9 @@ function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText,
             onChangeText={handleMemoTextChange}
             multiline
           />
-          <TouchableOpacity onPress={onSave} style={styles.saveButton}>
+          <TouchableOpacity onPress={handleSaveMemo} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>저장</Text>
           </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Text style={styles.memoText}>{memoText}</Text>
-          <TouchableOpacity onPress={onDelete} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>삭제</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleEdit} style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>수정</Text>
-          </TouchableOpacity>
-        </>
-      )}
         </View>
       </View>
     </Modal>
