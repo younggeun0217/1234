@@ -3,10 +3,8 @@ import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 function LoadingOverlay() {
     return (
         <View style={styles.container}>
-            <ActivityIndicator size="large" color="white" />
+            <ActivityIndicator size="large" color="black" />
             <Text style={styles.text}>로딩중입니다.</Text> 
-            <Text style={styles.text}>장기간 연결되지 않을 시</Text>
-            <Text style={styles.text}>인터넷 연결을 확인해주세요.</Text>
         </View>
     );
 }
