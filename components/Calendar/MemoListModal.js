@@ -11,7 +11,6 @@ import MemoModal from "./MemoModal";
 import { getMemoData } from "../../DB/localStorage";
 
 function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
-  const [selectedMemo, setSelectedMemo] = useState([]);
   const [memoText, setMemoText] = useState("");
   const [memoModalVisible, setMemoModalVisible] = useState(false);
   const [memoListVisible, setMemoListVisible] = useState(true);
@@ -19,7 +18,7 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   const [selectedScheduleTitle, setSelectedScheduleTitle] = useState("");
   const [currentScheduleId, setCurrentScheduleId] = useState(null);
   const [memoDataMap, setMemoDataMap] = useState({});
-
+  console.log(memoDataMap);
   const formattedDate = selectedDate.split("-").join(".");
 
   useEffect(() => {
@@ -28,7 +27,7 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
       await Promise.all(
         exhibitionDataByDate.map(async (item) => {
           const memoText = await getMemoData(item.title, formattedDate);
-          memoData[item.id] = memoText;
+          memoData[item.title] = memoText;
         })
       );
       setMemoDataMap(memoData);
@@ -42,12 +41,14 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   };
 
   const handleMemoTextChange = (text) => {
-    setMemoText(text);
+    const updatedMemoDataMap = { ...memoDataMap }; 
+    updatedMemoDataMap[selectedScheduleTitle] = text; 
+    setMemoDataMap(updatedMemoDataMap);
   };
 
   const handleEdit = (schedule) => {
-    console.log("선택된 일정 제목:", schedule.title);
-    setCurrentScheduleId(schedule.id); // 이 부분을 추가하세요
+    // console.log("선택된 일정 제목:", schedule.title);
+    setCurrentScheduleId(schedule.id);
     setSelectedScheduleTitle(schedule.title);
     setMemoText(savedMemos[schedule.id] || "");
     setMemoModalVisible(true);
@@ -63,20 +64,19 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
     if (!memoListVisible) return null;
   
     return exhibitionDataByDate.map((item) => (
-      <View key={item.id} style={styles.memoContainer}>
+      <View key={item.title} style={styles.memoContainer}>
         <View style={styles.memoHeader}>
           <TouchableOpacity onPress={() => handleEdit(item)}>
             <Text style={styles.memoText}>{item.title}</Text>
           </TouchableOpacity>
         </View>
-        {memoDataMap[item.id] && (
-          <Text style={styles.memoText}>메모 : {memoDataMap[item.id]}</Text>
+        {memoDataMap[item.title] && (
+          <Text style={styles.memoText}>메모 : {memoDataMap[item.title]}</Text>
         )}
       </View>
     ));
   }
   
-
   return (
     <Modal animationType="slide" transparent={true} visible={true}>
       <View style={styles.modalContainer}>
@@ -113,6 +113,7 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
             selectedScheduleTitle={selectedScheduleTitle}
             currentScheduleId={currentScheduleId}
             handleEdit={handleEdit}
+            memoDataMap={memoDataMap}
           />
         </View>
       </View>

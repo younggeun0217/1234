@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 import { addMemoToExhibition } from '../../DB/localStorage';
 
-function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText, handleMemoTextChange, selectedScheduleTitle, handleEdit }) {
+function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText, handleMemoTextChange, selectedScheduleTitle, memoDataMap }) {
   
   const handleSaveMemo = async () => {
     try {
@@ -30,7 +30,7 @@ function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText,
           <TextInput
             style={styles.memoInput}
             placeholder="메모를 입력하세요."
-            value={memoText}
+            value={memoDataMap[selectedScheduleTitle]}
             onChangeText={handleMemoTextChange}
             multiline
           />

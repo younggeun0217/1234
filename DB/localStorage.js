@@ -128,7 +128,6 @@ export const getMemoData = async (title, date) => {
           const likedExhibitionData = JSON.parse(data);
           const memoData = likedExhibitionData[date];
           if (memoData) {
-              console.log(memoData.memoText);
               return memoData.memoText;
           } else {
               console.log(`${title}에 있는 ${date} 메모를 찾지 못하였습니다.`);
