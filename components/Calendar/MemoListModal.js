@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   Dimensions,
 } from "react-native";
 import MemoModal from "./MemoModal";
-import { getMemoData } from "../../DB/localStorage";
+import { getMemoData, deleteMemoFromExhibition } from "../../DB/localStorage";
 
-function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
+function MemoListModal({ selectedDate, onClose, exhibitionDataByDate, memoFlag, setMemoFlag }) {
   const [memoText, setMemoText] = useState("");
   const [memoModalVisible, setMemoModalVisible] = useState(false);
   const [memoListVisible, setMemoListVisible] = useState(true);
@@ -20,7 +20,7 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   const [memoDataMap, setMemoDataMap] = useState({});
   const formattedDate = selectedDate.split("-").join(".");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     async function fetchMemoData() {
       const memoData = {};
       await Promise.all(
@@ -31,9 +31,8 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
       );
       setMemoDataMap(memoData);
     }
-
     fetchMemoData();
-  }, [selectedDate, exhibitionDataByDate]);
+  }, [selectedDate, exhibitionDataByDate, memoFlag]);
 
   const toggleMemoModal = () => {
     setMemoModalVisible(!memoModalVisible);
@@ -59,9 +58,23 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
     return lines.slice(0, 3).join("\n") + "...";
   };
 
+  const formatDate = (date) => {
+    const parts = date.split('-');
+    return `${parts[0]}.${parts[1]}.${parts[2]}`;
+  };
+
+  function handleMemoDeletion(title, date) { // 메모 삭제 핸들러
+    deleteMemoFromExhibition(title, date)
+      .then(() => {
+        setMemoFlag((prevMemoFlag) => !prevMemoFlag);
+      })
+      .catch((error) => {
+        console.log('메모 삭제 에러 발생:', error);
+      });
+  }
+
   function memoList() {
     if (!memoListVisible) return null;
-  
     return exhibitionDataByDate.map((item) => (
       <View key={item.title} style={styles.memoContainer}>
         <View style={styles.memoHeader}>
@@ -69,9 +82,14 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
             <Text style={styles.memoText}>{item.title}</Text>
           </TouchableOpacity>
         </View>
-        {memoDataMap[item.title] && (
-          <Text style={styles.memoText}>메모 : {memoDataMap[item.title]}</Text>
-        )}
+          {memoDataMap[item.title] && (
+            <View style={styles.memoInnerContainer}>
+              <Text style={styles.memoText}>메모 : {memoDataMap[item.title]}</Text>
+              <TouchableOpacity onPress={() => handleMemoDeletion(item.title, formatDate(selectedDate))}>
+                <Text style={styles.memoDeleteButton}>X</Text>
+              </TouchableOpacity>
+            </View>
+          )}
       </View>
     ));
   }
@@ -113,6 +131,8 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
             currentScheduleId={currentScheduleId}
             handleEdit={handleEdit}
             memoDataMap={memoDataMap}
+            memoFlag={memoFlag}
+            setMemoFlag={setMemoFlag}
           />
         </View>
       </View>
@@ -157,9 +177,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderBottomColor: "rgba(163, 160, 152, 0.8)",
   },
+  memoInnerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
   memoText: {
     marginHorizontal: 4,
     marginVertical: 5,
+  },
+  memoDeleteButton: {
+    color: 'red',
+    fontSize: 20
   },
   memoModalContainer: {
     backgroundColor: "rgba(0, 0, 0, 0.1)",

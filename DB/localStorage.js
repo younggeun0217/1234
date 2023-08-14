@@ -86,7 +86,6 @@ export const getAllLikedExhibitions = async () => {
         console.log(`key를 이용하여 찾지 못하였습니다. ${key}:`, error);
       }
     }
-
     return likedExhibitionDataArray;
   } catch (error) {
     console.log("fetching 에러가 발생하였습니다. :", error);
@@ -126,7 +125,6 @@ export const getMemoData = async (title, date) => {
       if (data) {
           const likedExhibitionData = JSON.parse(data);
           const memoData = likedExhibitionData[date];
-
           if (memoData) {
               return memoData.memoText;
           } else {
@@ -153,7 +151,7 @@ export const deleteMemoFromExhibition = async (title, date) => {
       const likedExhibitionData = JSON.parse(data);
 
       if (likedExhibitionData[date]) {
-        delete likedExhibitionData[date].memoText; // 메모가 있으면 삭제하기
+        delete likedExhibitionData[date]; // 메모가 있으면 삭제하기
         const updatedData = JSON.stringify(likedExhibitionData);
         await AsyncStorage.setItem(title, updatedData);
         console.log(`${title}의 ${date} 메모가 삭제되었습니다.`);

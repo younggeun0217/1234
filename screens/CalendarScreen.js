@@ -10,6 +10,9 @@ function CalendarScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [exhibitionData, setExhibitionData] = useState([]); // 로컬 스토리지 데이터들
+  const highlightedDate = {};
+
+  const [memoFlag, setMemoFlag] = useState(false); // 메모 삭제 시 useEffect 발동 용 Flag
 
   useFocusEffect( // 화면 렌더링하기 위해 사용
     React.useCallback(() => {
@@ -19,7 +22,7 @@ function CalendarScreen() {
       };
   
       fetchExhibitionData();
-    }, [])
+    }, [memoFlag])
   );
 
   const handleDayPress = (day) => {
@@ -78,16 +81,21 @@ function CalendarScreen() {
 
   // 강조 07월 04일
   // 여기에 하드코딩 된 객체 교체
-  const highlightedDate = {
-    "2023-08-12": { selected: true, selectedColor: "#B8B5AD" },
-    "2023-08-18": { selected: true, selectedColor: "#B8B5AD" },
-  };
 
-  // 여기에 하드코딩 된 객체 교체
+  exhibitionData.forEach((item) => {
+    for (const date in item) {
+      if (date !== 'color' && date !== 'duration' && date !== 'key') {
+        const formattedDate = formatDate(date);
+        // highlightedDate[formattedDate] = { selected: true, selectedColor: item.color };
+        highlightedDate[formattedDate] = { selected: true, selectedColor: "#B8B5AD"};
+      }
+    }
+  })
+
   const markedDates = getMarked(
     exhibitionData.map((item) => ({
-      startingDay: item.startDate, // Change this according to your data structure
-      duration: item.duration, // You need to implement this function
+      startingDay: item.startDate,
+      duration: item.duration, 
       color: item.color,
     })),
     highlightedDate
@@ -135,6 +143,8 @@ function CalendarScreen() {
             selectedDate={selectedDate}
             onClose={() => setIsModalVisible(false)}
             exhibitionDataByDate={exhibitionDataByDate}
+            memoFlag={memoFlag}
+            setMemoFlag={setMemoFlag}
           />
         )}
       </View>
