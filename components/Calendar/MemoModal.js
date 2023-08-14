@@ -2,15 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 import { addMemoToExhibition } from '../../DB/localStorage';
 
-function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, memoText, handleMemoTextChange, selectedScheduleTitle, memoDataMap }) {
+function MemoModal({ memoModalVisible, toggleMemoModal, formattedDate, handleMemoTextChange, selectedScheduleTitle, memoDataMap }) {
   
   const handleSaveMemo = async () => {
     try {
-      await addMemoToExhibition(selectedScheduleTitle, formattedDate, memoText);
+      await addMemoToExhibition(selectedScheduleTitle, formattedDate, memoDataMap[selectedScheduleTitle]);
   
       toggleMemoModal();
     } catch (error) {
-      console.log("Error saving memo:", error);
+      console.log("에러 저장 오류:", error);
     }
   };
   

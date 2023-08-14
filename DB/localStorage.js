@@ -100,7 +100,6 @@ export const getAllLikedExhibitions = async () => {
 export const addMemoToExhibition = async (title, date, memoText) => {
   try {
     const data = await AsyncStorage.getItem(title);
-
     if (data) {
       const likedExhibitionData = JSON.parse(data);
       
@@ -127,6 +126,7 @@ export const getMemoData = async (title, date) => {
       if (data) {
           const likedExhibitionData = JSON.parse(data);
           const memoData = likedExhibitionData[date];
+
           if (memoData) {
               return memoData.memoText;
           } else {

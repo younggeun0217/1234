@@ -18,7 +18,6 @@ function MemoListModal({ selectedDate, onClose, exhibitionDataByDate }) {
   const [selectedScheduleTitle, setSelectedScheduleTitle] = useState("");
   const [currentScheduleId, setCurrentScheduleId] = useState(null);
   const [memoDataMap, setMemoDataMap] = useState({});
-  console.log(memoDataMap);
   const formattedDate = selectedDate.split("-").join(".");
 
   useEffect(() => {
