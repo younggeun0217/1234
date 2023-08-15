@@ -10,7 +10,7 @@ function MapScreen() {
       <Text
         style={{
           color: '#A3A098',
-          fontFamily: 'Jua',
+          
           lineHeight: 38,
           fontSize: 30,
         }}
